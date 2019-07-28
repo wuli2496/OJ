@@ -1,2 +1,7 @@
+CFLAGS = -DDEBUG
 usaco:*.cpp
-	g++ -g -o $@ $*
+	g++ $(CFLAGS) -g -o $@ $^ 
+.PHONY: clean
+
+clean:
+	rm -rf *.o

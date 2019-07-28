@@ -8,6 +8,7 @@ LANG:C++
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -23,9 +24,21 @@ public:
 		
 		return x < other.x;
 	}
+
 public:
 	int x, y;
 };
+
+ostream& operator<<(ostream& stream, const Point& point)
+{
+	stream << "(" << point.x << "," << point.y << ")" << endl;
+}
+
+void print(const Point& point)
+{
+	cout << point;
+}
+
 
 class Solution
 {
@@ -33,60 +46,124 @@ public:
 	Solution(vector<Point> points)
 	{
 		m_points = points;
+		ans = 0;
 	}
 	
 	int solve()
 	{
-		vector<int>* pGraph = new vector<int>[m_points.size()];
-		buildGraph(pGraph);		
-		vector<bool> vis;
-		vis.resize(m_points.size());
-		int ans = 0;
+		sort(m_points.begin(), m_points.end());
+#ifdef DEBUG
+		for_each(m_points.begin(), m_points.end(), print);
+#endif
+		fillRights();
+#ifdef DEBUG
+		copy(m_rights.begin(), m_rights.end(), ostream_iterator<int>(cout, " "));		
+		cout << endl;
+#endif
+		m_vis.resize(m_points.size());
+		fill(m_vis.begin(), m_vis.end(), false);
+		m_pairs.resize(m_points.size());
+		fill(m_pairs.begin(), m_pairs.end(), -1);
 
-		for (size_t i = 0; i < m_points.size(); ++i)
-		{
-			if (!vis[i])
-			{
-				dfs(pGraph, i, ans, vis); 
-			}
-		}
+		dfs(0);
 
 		return ans;
 	}
 
 private:
-	void buildGraph(vector<int> *graph)
+	void fillRights()
 	{
-		size_t len = m_points.size();
-		for (size_t i = 0; i < len - 1; ++i)
+		m_rights.resize(m_points.size());
+		fill(m_rights.begin(), m_rights.end(), -1);
+
+		for (int i = 0; i < m_rights.size() - 1; ++i)
 		{
 			if (m_points[i + 1].y == m_points[i].y)
 			{
-				graph[i].push_back(i + 1);
-				graph[i + 1].push_back(i);
+				m_rights[i] = i + 1;			
 			}
 		}
 	}
 
-	void dfs(vector<int>* pGraph, int cur, int& ans, vector<bool>& vis)
+	void dfs(int cur)
 	{
-		size_t len = pGraph[cur].size();
-		vis[cur] = true;
-		for (int i = 0; i < len; ++i)
+		if (cur > m_points.size() - 2)
 		{
-			int v = pGraph[cur][i];
-			if (vis[v])
+#ifdef DEBUG
+			copy(m_pairs.begin(), m_pairs.end(), ostream_iterator<int>(cout, " "));
+			cout << endl;
+#endif
+			check();			
+			return;
+		}
+	
+		int u = -1;
+		int size = m_points.size();
+		for (int i = 0; i < size; ++i)
+		{
+			if (!m_vis[i])
+			{
+				u = i;
+				break;
+			}
+		}
+
+		m_vis[u] = true;
+		for (int v = u + 1; v < size; ++v)
+		{
+			if (!m_vis[v])
+			{
+				m_vis[v] = true;
+				m_pairs[u] = v;
+				m_pairs[v] = u;
+				dfs(cur + 2);
+				m_vis[v] = false;
+			}
+		}
+
+		m_vis[u] = false;
+	}
+
+	void check()
+	{
+		int size = m_points.size();
+		vector<int> vis(size);
+		fill(vis.begin(), vis.end(), -1);
+		int p = -1;
+		for (int i = 0; i < size; ++i)
+		{
+			if (vis[i] != -1)
 			{
 				continue;
 			}
 			
-			vis[v] = true;
-			++ans;
-			break;
+			p = i;
+			while ((p != -1) && (vis[p] == -1))
+			{
+				vis[p] = i;
+				p = m_rights[p];
+				if (p != -1)
+				{
+					p = m_pairs[p];
+				}
+			}
+			if ((p != -1) && vis[p] == i)
+			{
+#ifdef DEBUG
+				cout << "p:" << p << " i:" << i << endl;
+#endif
+				++ans;
+				break;
+			}
 		}
 	}
+
 private:
 	vector<Point> m_points;
+	vector<int> m_rights;
+	vector<bool> m_vis;
+	vector<int> m_pairs;
+	int ans;
 };
 
 int main(int argc, char** argv)
