@@ -1,3 +1,8 @@
+/*
+ID:wuli2491
+TASK:skidesign
+LANG:C++
+*/
 #include <iostream>
 #include <fstream>
 #include <vector>
