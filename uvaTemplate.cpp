@@ -3,11 +3,12 @@
 
 using namespace std;
 
+template<typename Result>
 class AlgoPolicy
 {
 public:
     ~AlgoPolicy() {}
-    virtual void execute() = 0;
+    virtual Result execute() = 0;
 };
 
 int main()
