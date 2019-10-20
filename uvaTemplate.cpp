@@ -21,7 +21,7 @@ int main()
     streambuf* cinback = cin.rdbuf(fin.rdbuf());
 #endif
 
-#ifndef ONLINE_JUDGEL
+#ifndef ONLINE_JUDGE
     cin.rdbuf(cinback);
 #endif
 }
