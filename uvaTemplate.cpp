@@ -7,7 +7,7 @@ template<typename Result>
 class AlgoPolicy
 {
 public:
-    ~AlgoPolicy() {}
+    virtual ~AlgoPolicy() {}
     virtual Result execute() = 0;
 };
 
