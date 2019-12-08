@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include <queue>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ template<typename Result>
 class AlgoPolicy
 {
 public:
-    ~AlgoPolicy() {}
+    virtual ~AlgoPolicy() {}
     virtual Result execute() = 0;
 };
 
@@ -21,19 +22,9 @@ struct Product
 
     bool operator<(const Product& other) const
     {
-        if (deadline != other.deadline)
-        {
-            return deadline < other.deadline;
-        }
-        
-        return profit > other.profit;
+        return deadline < other.deadline;
     }
 };
-
-void print(Product& p)
-{
-    cout << p.profit << " " << p.deadline << endl;
-}
 
 class GreedyAlgo : public AlgoPolicy<int>
 {
@@ -46,14 +37,25 @@ public:
    virtual int execute() override
    {
         sort(products.begin(), products.end());
-        int curTime = 0;
+
         int totalProfit = 0;
+        priority_queue<int, vector<int>, greater<int>> pq;
         for (size_t i = 0; i < products.size(); ++i)
         {
-            if (products[i].deadline > curTime)
+            if (products[i].deadline > pq.size())
             {
+                pq.push(products[i].profit);
                 totalProfit += products[i].profit;
-                curTime = products[i].deadline;
+            }
+            else
+            {
+                if (products[i].profit > pq.top())
+                {
+                    totalProfit -= pq.top();
+                    pq.pop();
+                    pq.push(products[i].profit);
+                    totalProfit += products[i].profit;
+                }
             }
         }
 
@@ -97,7 +99,7 @@ int main()
     cin.tie(nullptr);
 
 #ifndef ONLINE_JUDGE
-    ifstream fin("/home/wl/OJ/OJ/UVa/uvain");
+    ifstream fin("F:\\OJ\\uva_in.txt");
     streambuf* cinback = cin.rdbuf(fin.rdbuf());
 #endif
 
