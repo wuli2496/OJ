@@ -136,12 +136,13 @@ public:
         --testCases;
         Data data;
         instream >> data.w;
-        size_t n;
+        int n;
         instream >> n;
-        data.lines.resize(n);
-        for (size_t i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
         {
-            instream >> data.lines[i].d >> data.lines[i].l >> data.lines[i].r;
+            Line line;
+            instream >> line.d >> line.l >> line.r;
+            data.lines.push_back(line);
         }
         
         return data;
