@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <memory>
 #include <set>
-#include <queue>
 #include <cmath>
 #include <map>
 
@@ -37,132 +36,132 @@ public:
     virtual void write() = 0;
 };
 
-struct Node
-{
-    int state;
-    set<int> s;
-};
-
 struct Data
 {
     vector<int> d;
 };
 
-class BfsAlgo : public AlgoPolicy<set<int>>
+void print(int num)
+{
+    cout << num << " ";
+}
+
+class DfsAlgo : public AlgoPolicy<set<int>>
 {
 public:
-    BfsAlgo(const Data& data)
+    DfsAlgo(const Data& data)
     {
         this->data = data;
     }
     
     set<int> execute() override
-    {
-        int n = data.d.size();
-        map<int, int> idx;
-        for (int i = 0; i < n; ++i)
-        {
-            idx[data.d[i]] = i;
-        }
+    {        
+        vector<int> availableSet;
+        initAvailalbleSet(availableSet);
         
-        Node initial;
-        initial.state = 0;
-        initial.s.insert(0);
+        set<int> dset(data.d.begin(), data.d.end());
         
-        queue<Node> q;
-        q.push(initial);
-        
-        map<int, bool> vis;
+        map<int, int> property;
         set<int> ans;
-        int maxVal = data.d[n - 1];
-        while(!q.empty())
-        {
-            Node curState = q.front();
-            q.pop();
-            
-            if (curState.state == (1 << n) - 1)
-            {
-                if (ans.size() == 0)
-                {
-                    ans = curState.s;
-                }
-                else 
-                {
-                    if (ans.size() > curState.s.size())
-                    {
-                        ans = curState.s;
-                    }
-                }
-            }
-            
-            if (curState.s.size() == MAXSIZE)
-            {
-                continue;
-            }
-            
-            for (int i = 0; i < n; ++i)
-            {
-                if (curState.state & (1 << i))
-                {
-                    continue;
-                }
-                
-                for(auto& curVal : curState.s)
-                {
-                    if (curVal + data.d[i] <= maxVal)
-                    {
-                        Node newStatus = curState;
-                        int sum = curVal + data.d[i];
-                        
-                        for (auto& newStatusVal : newStatus.s)
-                        {
-                            int val = abs(newStatusVal - sum);
-                            if (idx.find(val) == idx.end())
-                            {
-                                continue;
-                            }
-                             
-                            newStatus.state |= (1 << idx[val]);
-                        }
-                        
-                        newStatus.s.insert(sum);
-                        if (!vis[newStatus.state])
-                        {
-                            q.push(newStatus);
-                            vis[newStatus.state] = true;
-                        }
-                    }
-                    
-                    if (curVal > data.d[i])
-                    {
-                        Node newStatus = curState;
-                        int sum = curVal - data.d[i];
-                        
-                        for (auto& newStatusVal : newStatus.s)
-                        {
-                            int val = abs(newStatusVal - sum);
-                            if (idx.find(val) == idx.end())
-                            {
-                                continue;
-                            }
-                             
-                            newStatus.state |= (1 << idx[val]);
-                        }
-                        
-                        newStatus.s.insert(sum);
-                        if (!vis[newStatus.state])
-                        {
-                            q.push(newStatus);
-                            vis[newStatus.state] = true;
-                        }
-                    }
-                }
-            }
-        }
+        vector<int> curAns;
+        curAns.push_back(0);
+        dfs(0, availableSet, 0, curAns, 0, ans, property, dset);
         
         return ans;
     }
     
+    
+private:
+    void initAvailalbleSet(vector<int>& s)
+    {
+        set<int> ans;
+        for (size_t i = 0; i < data.d.size(); ++i)
+        {
+            ans.insert(data.d[i]);
+        }
+        
+        for (size_t i = 0; i < data.d.size(); ++i)
+        {
+            for (size_t j = i + 1; j < data.d.size(); ++j)
+            {
+                ans.insert(data.d[j] - data.d[i]);
+            }
+        }
+        
+        
+        for(auto& n : ans)
+        {
+            s.push_back(n);
+        }
+    }
+    
+    void dfs(int curDepth, const vector<int>& v, int cur, vector<int>& curAns, int size, set<int>& ans, map<int, int>& property, const set<int>& dset)
+    {
+        if (curDepth >= MAXSIZE)
+        {
+            return;
+        }
+        
+        if (size == static_cast<int>(data.d.size()))
+        {
+            if (ans.size() == 0 || curAns.size() < ans.size())
+            {
+                ans.clear();
+                for (size_t i = 0; i < curAns.size(); ++i)
+                {
+                    ans.insert(curAns[i]);
+                }
+            }
+            
+            return;
+        }
+        
+        for (size_t i = cur; i < v.size(); ++i)
+        {
+            int cnt = add(v[i], curAns, property, dset);
+            if (!cnt)
+            {
+                del(v[i], curAns, property, dset);
+                continue;
+            }
+            
+            curAns.push_back(v[i]);
+            dfs(curDepth + 1, v, i + 1, curAns, size + cnt, ans, property, dset);
+            curAns.pop_back();
+            del(v[i], curAns, property, dset);
+        }
+    }
+    
+    int add(int d, const vector<int>& curAns, map<int, int>& property, const set<int>& dset)
+    {
+        int cnt = 0;
+        for (size_t i = 0; i < curAns.size(); ++i)
+        {
+            int diff = abs(curAns[i] - d);
+            if (dset.count(diff))
+            {
+                ++property[diff];
+                if (property[diff] == 1)
+                {
+                    ++cnt;
+                }
+            }
+        }
+        
+        return cnt;
+    }
+    
+    void del(int d, const vector<int>& curAns, map<int, int>& property, const set<int>& dset)
+    {
+        for (size_t i = 0; i < curAns.size(); ++i)
+        {
+            int diff = abs(curAns[i] - d);
+            if (dset.count(diff))
+            {
+                --property[diff];
+            }
+        }
+    }
 private:
     Data data;
     const int MAXSIZE = 7;
@@ -212,11 +211,8 @@ public:
         
         sort(data.d.begin(), data.d.end());
         
-        auto it = unique(data.d.begin(), data.d.end());
-        if (it != data.d.end())
-        {
-            data.d.erase(it, data.d.end());
-        }
+        data.d.erase(unique(data.d.begin(), data.d.end()), data.d.end());
+        
         return data;
     }
     
@@ -251,7 +247,7 @@ public:
             }
         }
         
-        cout << endl;
+        out << endl;
     }
 private:
     ostream& out;
@@ -262,13 +258,13 @@ private:
 
 int Output::caseNo = 1;
 
-int main(int argc, char **argv)
+int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
 #ifndef ONLINE_JUDGE
-    ifstream fin("/cygdrive/f/OJ/uva_in.txt");
+    ifstream fin("F:\\OJ\\uva_in.txt");
     streambuf* cinback = cin.rdbuf(fin.rdbuf());
 #endif
     
@@ -276,7 +272,7 @@ int main(int argc, char **argv)
     while (in.get() != nullptr && in->hasNext())
     {
         Data data = in->next();
-        AlgoPolicy<set<int>>* algo = new BfsAlgo(data);
+        AlgoPolicy<set<int>>* algo = new DfsAlgo(data);
         Solution<set<int>> solution(algo);
         set<int> s = solution.run();
         shared_ptr<OutputPolicy> output(new Output(cout, s));
@@ -287,5 +283,5 @@ int main(int argc, char **argv)
     cin.rdbuf(cinback);
 #endif
 
-	return 0;
+    return 0;
 }
