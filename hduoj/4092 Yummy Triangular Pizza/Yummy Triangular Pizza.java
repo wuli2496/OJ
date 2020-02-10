@@ -70,7 +70,7 @@ class Output implements OutputPolicy
 	
 	public void write()
 	{
-		coutPrintWriter.printf("Case #%d: %d\n", caseNo, ans);
+		coutPrintWriter.println("Case #" + caseNo + ": " + ans);
 		coutPrintWriter.flush();
 		++caseNo;
 	}
