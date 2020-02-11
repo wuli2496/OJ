@@ -73,6 +73,8 @@ public:
         map<int, int> componentmap;
         int maxRoom = 0;
         
+		breadFirstScan(component, componentmap, maxRoom);
+#if 0
         for (int i = 0; i < data.n; ++i)
         {
             for (int j = 0; j < data.m; ++j)
@@ -90,6 +92,7 @@ public:
                 }
             }
         }
+#endif
 #if 0
         cout << "======================" << endl;
         for (int i = 0; i < data.n; ++i)
@@ -192,6 +195,60 @@ private:
             ++componentMap[component];
             depthFirstSearch(xx, yy, component, componentMap);
         }
+    }
+	
+	void breadFirstScan(int& component, map<int, int>& componentMap, int& maxRoom)
+    {
+        component = 0;
+        for (int i = 0; i < data.n; ++i)
+        {
+            for (int j = 0; j < data.m; ++j)
+            {
+                if (f[i][j] == 0)
+                {
+                    f[i][j] = -2;
+                    ++component;
+                    floodFill(component, componentMap, maxRoom);
+                }
+            }
+        }
+    }
+    
+    void floodFill(int& component, map<int, int>& componentMap, int& maxRoom)
+    {
+        int numVisited = 0;
+        do 
+        {
+            numVisited = 0;
+            for (int i = 0; i < data.n; ++i)
+            {
+                for (int j = 0; j < data.m; ++j)
+                {
+                    if (f[i][j] == -2)
+                    {
+                        ++numVisited;
+                        f[i][j] = component;
+                        ++componentMap[component];
+                        if (componentMap[component] > maxRoom)
+                        {
+                            maxRoom = componentMap[component];
+                        }
+                        
+                        for (int k = 0; k < DIRSIZE; ++k)
+                        {
+                            int xx = i + dx[k];
+                            int yy = j + dy[k];
+                            if (xx < 0 || xx >= data.n || yy < 0 || yy >= data.m || data.grid[i][j][k] || (f[xx][yy] != 0 && f[xx][yy] != -2))
+                            {
+                                continue;
+                            }
+                            
+                            f[xx][yy] = -2;
+                        }
+                    }
+                }
+            }
+        } while (numVisited != 0);
     }
 private:
     Data data;
