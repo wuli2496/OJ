@@ -175,6 +175,24 @@ private:
             }
         }
     }
+	
+	void depthFirstSearch(int x, int y, int component, map<int, int>& componentMap)
+    {
+        f[x][y] = component;
+        
+        for (int i = 0; i < DIRSIZE; ++i)
+        {
+            int xx = x + dx[i];
+            int yy = y + dy[i];
+            if (xx < 0 || xx >= data.n || yy < 0 || yy >= data.m || data.grid[x][y][i] || f[xx][yy] != 0)
+            {
+                continue;
+            }
+            
+            ++componentMap[component];
+            depthFirstSearch(xx, yy, component, componentMap);
+        }
+    }
 private:
     Data data;
     int f[MAXN][MAXN];
