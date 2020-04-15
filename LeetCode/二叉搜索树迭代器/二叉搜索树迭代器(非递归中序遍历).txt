@@ -1,0 +1,50 @@
+import java.util.Stack;
+
+class TreeNode 
+{
+	int val;
+	TreeNode left;
+	TreeNode right;
+	TreeNode(int x) { val = x; }
+}
+
+class BSTIterator 
+{
+    public BSTIterator(TreeNode root)
+    {
+    	stack = new Stack<>();
+    	inOrder(root);
+    }
+    
+    /** @return the next smallest number */
+    public int next() 
+    {
+    	TreeNode node = stack.pop();
+    	
+    	if (node.right != null)
+    	{
+    		inOrder(node.right);
+    	}
+    	
+    	return node.val;
+    }
+    
+    /** @return whether we have a next smallest number */
+    public boolean hasNext() 
+    {
+    	return stack.size() > 0;
+    }
+    
+    private void inOrder(TreeNode root)
+    {
+    	while (root != null)
+    	{
+    		stack.push(root);
+    		root = root.left;
+    	}
+    	
+    	return;
+    }
+    
+    private Stack<TreeNode> stack; 
+}
