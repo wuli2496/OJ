@@ -20,30 +20,56 @@ import java.util.TreeSet;
 
 class Solution 
 {
-	 public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) 
+	 class Solution {
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) 
 	 {
-		 TreeSet<Integer> set = new TreeSet<>();
+		 if (t < 0)
+		 {
+			 return false;
+		 }
+		 
+		 Map<Long, Long> map = new HashMap<>();
+		 long w = (long)t + 1;
 		 for (int i = 0; i < nums.length; ++i)
 		 {
-			 Integer next = set.ceiling(nums[i]);
-			 if (next != null && next <= nums[i] + t)
+			 long id = getId(nums[i], w);
+			 
+			 if (map.containsKey(id))
 			 {
 				 return true;
 			 }
 			 
-			 Integer prev = set.floor(nums[i]);
-			 if (prev != null && prev + t >= nums[i])
+			 if (map.containsKey(id - 1) && Math.abs(nums[i] - map.get(id - 1)) <= t)
 			 {
 				 return true;
 			 }
 			 
-			 set.add(nums[i]);
-			 if (set.size() > k)
+			 if (map.containsKey(id + 1) && Math.abs(nums[i] - map.get(id + 1)) <= t)
 			 {
-				 set.remove(nums[i - k]);
+				 return true;
+			 }
+			 
+			 map.put(id, (long)nums[i]);
+			 
+			 if (i >= k)
+			 {
+				 map.remove(getId(nums[i - k], w));
 			 }
 		 }
 		 
 		 return false;
 	 }
+	 
+	 private long getId(long x, long w)
+	 {
+		 if (x < 0)
+		 {
+			 return (x + 1) / w - 1;
+		 }
+		 else 
+		 {
+			 return x / w;
+		 }
+	 }
+}
 }
