@@ -81,7 +81,12 @@ class Solution
 	private void init()
 	{
 		int n = index + 1;
-		dp = new int[n][n];
+		int m = 0;
+		while ((1 << m) <= n)
+		{
+			++m;
+		}
+		dp = new int[n][m];
 		for (int i = 0; i < n; ++i)
 		{
 			for (int j = 0; (1 << j) < n; ++j)
