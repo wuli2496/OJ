@@ -1,6 +1,6 @@
 
 /*
- * dp(x + b) = dp(x) + 1,其中b=2^m
+ * dp(x) = dp(x / 2) + x % 2
  * */
 
 class Solution 
@@ -8,20 +8,11 @@ class Solution
 	public int[] countBits(int num) 
 	{
 		int[] cnt = new int[num + 1];
-		int i = 0;
-		int b = 1;
 		
-		while (b <= num)
+		for (int i = 0; i < cnt.length; ++i)
 		{
-			while (i < b && i + b <= num)
-			{
-				cnt[i + b] = cnt[i] + 1;  
-				++i;
-			}
-			i = 0;
-			b <<= 1;
+			cnt[i] = cnt[i / 2] + i % 2; 
 		}
-		
 		return cnt;
     }
 }
