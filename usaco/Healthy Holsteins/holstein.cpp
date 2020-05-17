@@ -116,6 +116,75 @@ private:
     const Data& data;
 };
 
+class DfsAlgo : public AlgoPolicy<string>
+{
+public:
+    DfsAlgo(Data& otherData)
+        : data(otherData)
+    {
+        best = data.feeds.size() + 1;
+    }
+    
+    string execute() override
+    {
+        dfs(0, 0);
+        return generateStr(bestFeed);
+    }
+
+private:
+    void dfs(int fcnt, int fid)
+    {
+        size_t index;
+        for (index = 0; index < data.vitamins.size(); ++index)
+        {
+            if (data.vitamins[index] > 0)
+            {
+                break;
+            }
+        }
+
+        if (index >= data.vitamins.size())
+        {
+            best = fcnt;
+            bestFeed = curFeed;
+            return;
+        }
+
+        while ((fcnt + 1 < best) && (fid < data.feeds.size()))
+        {
+            for (size_t i = 0; i < data.vitamins.size(); ++i)
+            {
+                data.vitamins[i] -= data.feeds[fid][i];
+            }
+
+            curFeed.push_back(fid + 1);
+            dfs(fcnt + 1, fid + 1);
+            curFeed.pop_back();
+            for (size_t i = 0; i < data.vitamins.size(); ++i)
+            {
+                data.vitamins[i] += data.feeds[fid][i];
+            }
+            ++fid;
+        }
+    }
+
+    string generateStr(const vector<int>& v)
+    {
+        string ans = to_string(best);
+        for (auto& n : v)
+        {
+            ans += " ";
+            ans += to_string(n);
+        }
+
+        return ans;
+    }
+private:
+    Data& data;
+    int best;
+    vector<int> bestFeed, curFeed;
+};
+
 template<typename Result>
 class Solution
 {
@@ -143,11 +212,15 @@ public:
         return instance;
     }
 
-    AlgoPolicy<string>* createAlgo(string algoName, const Data& data)
+    AlgoPolicy<string>* createAlgo(string algoName, Data& data)
     {
         if (algoName == "bfs")
         {
             return new BfsAlgo(data);
+        }
+        else if (algoName == "dfs")
+        {
+            return new DfsAlgo(data);
         }
         else 
         {
@@ -215,7 +288,7 @@ int main()
     }
 
     //print(data);
-    AlgoPolicy<string>* algo = AlgoFactory::getInstance().createAlgo("bfs", data);
+    AlgoPolicy<string>* algo = AlgoFactory::getInstance().createAlgo("dfs", data);
     Solution<string> solution(algo);
     string ans = solution.run();
     cout << ans << endl;
