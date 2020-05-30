@@ -1,5 +1,7 @@
 filename=`find ./ -name *.cpp`
-exename=$(basename ${filename})
+filename=${filename// /\\ }
+echo ${filename}
+exename=$(basename "${filename}")
 exe=${exename%%.cpp}
 
 function genMakefile()
@@ -11,12 +13,12 @@ function genMakefile()
     echo -e "CC:=g++" >> Makefile
 
     echo -e "" >> Makefile
-    echo -e '$(EXE):$(FILE)' >> Makefile
-    echo -e '\t\t$(CC) $(CFLAGS) $@ $^' >> Makefile
+    echo -e '${EXE}:${FILE}' >> Makefile
+    echo -e '\t\t${CC} ${CFLAGS} "$@" "$^"' >> Makefile
    
     echo -e "" >> Makefile
     echo -e ".PHONY:clean" >> Makefile
-    echo -e '\t\trm -rf *.o $(EXE)' >> Makefile
+    echo -e '\t\trm -rf *.o ${EXE}' >> Makefile
 }
 
 genMakefile
