@@ -1,4 +1,4 @@
-filename=`find ./ -name *.cpp`
+filename=$1
 filename=${filename// /\\ }
 echo ${filename}
 exename=$(basename "${filename}")
