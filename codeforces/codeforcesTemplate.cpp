@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define forn(i, s, e) for(int i = s; i < e; ++i)
+#define forn(i, s, e) for(int i = (s); i < (e); ++i)
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
