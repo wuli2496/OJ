@@ -10,6 +10,8 @@ using namespace std;
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 
+using LL = long long;
+
 template <typename T> 
 istream& operator>>(istream& in, vector<T>& v) 
 {
@@ -46,6 +48,7 @@ void chkMax(T& a, U b)
         a = b;
     }
 }
+
 int main()
 {
     ios::sync_with_stdio(false);
