@@ -54,7 +54,7 @@ inline void read(T& a)
 {
     char c = getchar();
     int f = 1;
-    int a = 0;
+    a = 0;
     while (c > '9' || c < '0') {
         if (c == '-') {
             f = -1;
