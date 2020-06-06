@@ -49,42 +49,129 @@ void chkMax(T& a, U b)
     }
 }
 
-template <typename T> 
-inline void read(T& a)
+struct IO 
 {
-    char c = getchar();
-    int f = 1;
-    a = 0;
-    while (c > '9' || c < '0') {
-        if (c == '-') {
-            f = -1;
+#define MAXSIZE (1 << 20)
+#define isdigit(x) (x >= '0' && x <= '9')
+    
+    char buf[MAXSIZE], *p1, *p2;
+    char pbuf[MAXSIZE], *pp;
+
+ #if DEBUG
+ #else
+    IO() : p1(buf), p2(buf), pp(pbuf) {}
+
+    ~IO()
+    {
+        fwrite(pbuf, 1, pp - - pbuf, stdout);
+    }
+ #endif
+
+    inline char gc()
+    {
+#if DEBUG
+        return getchar();
+#endif
+
+        if (p1 == p2) {
+            p2 = (p1 = buf) + fread(buf, 1, MAXSIZE, stdin);
         }
 
-        c = getchar();
+        return p1 == p2 ? ' ' : *p1++;
     }
 
-    while (c <= '9' && c >= '0') {
-        a = (a << 1) + (a << 3) + c - '0';
-        c = getchar();
+    inline bool blank(char ch)
+    {
+        return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t';
     }
 
-    a *= f;
-}
+    template <typename T>
+    inline void read(T& x)
+    {
+        double tmp = 1;
+        bool sign = 0;
+        x = 0;
 
-template <typename T>
-void write(T a)
-{
-    if (a < 0) {
-        putchar('-');
-        a = -a;
+        char ch = gc();
+        for (; !isdigit(ch); ch = gc()) {
+            if (ch == '-') {
+                sign = 1;
+            }
+        }
+
+        for (; isdigit(ch); ch = gc()) {
+            x = x * 10 + (ch - '0');
+        }
+
+        if (ch == '.') {
+            for (ch = gc(); isdigit(ch); ch = gc()) {
+                tmp /= 10.0;
+                x += tmp * (ch - '0');
+            }
+        }
+
+        if (sign) {
+            x = -x;
+        }
     }
 
-    if (a > 9) {
-        write(a / 10);
+    inline void read(char *s)
+    {
+        char ch = gc();
+        for (; blank(ch); ch = gc());
+        for (; !blank(ch); ch = gc()) {
+            *s++ = ch;
+        }
+
+        *s = 0;
     }
 
-    putchar(a % 10 + '0');
-}
+    inline void read(char& c) 
+    {
+        for (c = gc(); blank(c); c = gc());
+    }
+
+    inline void push(const char& c)
+    {
+        #if DEBUG
+            putchar(c);
+        #else 
+            if (pp - pbuf == MAXSIZE) {
+                fwrite(pbuf, 1, MAXSIZE, stdout);
+                pp = pbuf;
+            }
+
+            *pp++ = c;
+        #endif
+    }
+
+    template <typename T>
+    inline void write(T x)
+    {
+        if (x < 0) {
+            x = -x;
+            push('-');
+        }
+
+        static T sta[35];
+        T top = 0;
+        do {
+            sta[top++] = x % 10;
+            x /= 10;
+        } while (x);
+
+        while (top) {
+            push(sta[--top] + '0');
+        }
+    }
+
+    template <typename T>
+    inline void write(T x, char lastChar)
+    {
+        write(x);
+        push(lastChar);
+    }
+} io;
 
 int main()
 {
