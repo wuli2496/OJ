@@ -173,6 +173,28 @@ struct IO
     }
 } io;
 
+namespace Factor
+{
+    template<typename T>
+    inline qpow(T a, T b, T m)
+    {
+        T c = 1;
+
+        while (b)
+        {
+            if (b & 1) {
+                c = c * a % m;
+            }
+
+            a = a * a % m;
+
+            b >>= 1;
+        }
+
+        return c;
+    }
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
