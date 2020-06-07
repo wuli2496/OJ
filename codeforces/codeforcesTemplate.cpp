@@ -10,7 +10,13 @@ using namespace std;
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 
+#define st first
+#define nd second
+
 using LL = long long;
+using pii = pair<int, int>;
+using vi = vector<int>;
+using vpii = vector<pii>;
 
 template <typename T> 
 istream& operator>>(istream& in, vector<T>& v) 
@@ -63,7 +69,7 @@ struct IO
 
     ~IO()
     {
-        fwrite(pbuf, 1, pp - - pbuf, stdout);
+        fwrite(pbuf, 1, pp - pbuf, stdout);
     }
  #endif
 
@@ -176,7 +182,7 @@ struct IO
 namespace Factor
 {
     template<typename T>
-    inline qpow(T a, T b, T m)
+    inline T qpow(T a, T b, T m)
     {
         T c = 1;
 
