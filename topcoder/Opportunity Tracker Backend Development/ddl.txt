@@ -1,0 +1,154 @@
+drop table if exists evaluation;
+create table if not exists evaluation
+(
+ id int not null auto_increment, 
+ evaluation_notes text,
+ user_id int not null,
+ key (`id`)
+) ENGINE=InnoDB;
+
+drop table if exists evaluation_response;
+create table if not exists evaluation_response
+(
+ id int not null auto_increment, 
+ evaluation_id int,
+ critera_id int,
+ score int,
+ key (`id`)
+) engine=InnoDB;
+
+drop table if exists criteria;
+create table if not exists criteria
+(
+ id int not null auto_increment,
+ question_text text,
+ key (`id`)
+) ENGINE = InnoDB ;
+
+drop table if exists user;
+create table if not exists user
+(
+ id int not null auto_increment,
+ name varchar(128),
+ profile_picture varchar(128), 
+ okta_username varchar(45),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_memebers;
+create table if not exists opportunity_memebers
+(
+ opportunity_id int,
+ user_id int
+) ENGINE = InnoDB ;
+
+drop table if exists opportunity;
+create table if not exists opportunity 
+(
+ id int not null auto_increment, 
+ name varchar(128), 
+ tech_theme_id int,
+ source_id int,
+ description text,
+ company  varchar(128),
+ owner_id int ,
+ updated_on datetime,
+ created_on datetime,
+ created_by int, 
+ updated_by int,
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists tech_theme;
+create table if not exists tech_theme 
+(
+ id int not null auto_increment, 
+ icon varchar(128),
+ name varchar(128),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists discussion_post;
+create table if not exists discussion_post
+(
+ id int not null auto_increment,
+ opportunity_id int,
+ author_id int,
+ parent_id int,
+ content text,
+ created_on datetime,
+ updated_on datetime,
+ created_by int,
+ updated_by int,
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_views;
+create table if not exists opportunity_views
+(
+ opportunity_id int,
+ user_id int,
+ key (`opportunity_id`)
+) ENGINE = InnoDB;
+
+drop table if exists source;
+create table if not exists source
+(
+ id int not null auto_increment,
+ name varchar(128),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_tag;
+create table if not exists opportunity_tag
+(
+ opportunity_id int,
+ tag_id int,
+ key (`opportunity_id`)
+) ENGINE = InnoDB;
+
+drop table if exists tag;
+create table if not exists tag
+(
+ id int not null auto_increment,
+ lable varchar(128),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_document;
+create table if not exists opportunity_document
+(
+ opportunity_id int,
+ document_id int
+) ENGINE = InnoDB;
+
+drop table if exists document;
+create table if not exists document 
+(
+ id int not null auto_increment,
+ name varchar(128),
+ documentType varchar(128),
+ location varchar(128),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_phase;
+create table if not exists opportunity_phase
+(
+ id int not null auto_increment,
+ opportunity_id int,
+ status varchar(128),
+ start_date varchar(45),
+ end_date varchar(45),
+ key (`id`)
+) ENGINE = InnoDB;
+
+drop table if exists opportunity_link;
+create table if not exists opportunity_link
+(
+ id int not null auto_increment,
+ opportunity_id int,
+ link varchar(256),
+ key (`id`)
+) ENGINE = InnoDB;
+
