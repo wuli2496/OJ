@@ -1,0 +1,1663 @@
+openapi: 3.0.0
+servers: []
+info:
+  version: '1.0'
+  title: Hess Opportunities Backend API
+  description: |
+    Backend API for the Hess Opportunities application.
+tags:
+  - name: Opportunities
+    description: API related to managing Opportunities.
+  - name: Reports
+    description: API related to managing Reports.
+  - name: Discussions
+    description: API related to managing Discussion.
+  - name: Evaluation
+    description: API related to managing Evaluations.
+  - name: Lookups
+    description: API related to managing Lookups.
+  - name: Documents
+    description: API related to managing Documents.
+  - name: Notifications
+    description: API related to managing Notifications.
+  - name: Users
+    description: API related to managing Users.
+
+paths:
+  /opportunities:
+    get:
+      summary: Retrieve opportunities.  Filtering and pagination are supported.
+      description: |
+        Retrieve opportunities.  Filtering, pagination, and sorting are supported.
+        <br><b>Authorization:</b>All logged-in users are allowed to perform this operation.
+        <br><b>Implementation Notes:</b>
+        <ul>
+          <li>The main table to use is opportunity table.</li>
+          <li>The opportunity_phase without an end_date will be the current status of an opportunity.</li>
+          <li>productName is opportunity.name</li>
+        </ul>
+      tags:
+        - Opportunities
+      operationId: searchOpportunities
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/sortOrder'
+        - in: query
+          name: status
+          description: Filter by status.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/OpportunityStatus'
+        - in: query
+          name: productName
+          description: Search/Filter by product name.
+          schema:
+            type: string
+        - in: query
+          name: companyName
+          description: Search/Filter by company name.
+          schema:
+            type: string
+        - in: query
+          name: technologyTheme
+          description: Search/Filter by technology theme.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: lastUpdatedStart
+          description: Lower bound for filtering by lastUpdated attribute.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: lastUpdatedEnd
+          description: Upper bound for filtering by lastUpdated attribute.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: owner
+          description: Search/Filter by owner name.
+          schema:
+            type: string
+        - in: query
+          name: tags
+          description: Search/Filter by tags.
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunitySearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Create an opportunity with the given data.
+      description: |
+        Create an opportunity with the given data.
+        <br><b>Authorization:</b>All logged-in users are allowed to perform this operation.
+        <br><b>Implementation Notes:</b>
+        <ul>
+          <li>The main table to use is opportunity table.</li>
+          <li>The opportunity_phase without an end_date will be the current status of an opportunity.</li>
+          <li>productName is opportunity.name</li>
+          <li>The initial phase for the opportunity should also be created and set to "UnderEvaluation".
+        </ul>
+      tags:
+        - Opportunities
+      operationId: createOpportunity
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrEditOpportunityRequest'
+      responses:
+        '200':
+          $ref:  '#/components/responses/OpportunityDetailsWithIdResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reports/opportunitySummary:
+    get:
+      summary: Retrieve a summary of all opportunities in the system.
+      description: |
+        Retrieve a list of all opportunities in the system.  This is a count of opportunities
+        grouped by either status, technology or source.  Any of the given grouping can be specified,
+        or all groupings are returned if no grouping is specified.
+        <br><b>Authorization:</b>All logged-in users are allowed to perform this operation.
+        <br><b>Implementation Notes:</b>
+        <ul>
+          <li>The main table to use is opportunity table.</li>
+        </ul>
+      tags:
+        - Reports
+      operationId: getOpportunitySummaryReport
+      parameters:
+        - name: grouping
+          in: query
+          description: The type of grouping to use. If not specified, then all groupings are returned.
+          required: false
+          schema:
+            $ref: '#/components/schemas/OpportunitySummaryGrouping'
+        - name: dateStart
+          in: query
+          required: false
+          description: Filter by start date.
+          schema:
+            type: string
+            format: date-time
+        - name: dateEnd
+          in: query
+          required: false
+          description: Filter by end date.
+          schema:
+            type: string
+            format: date-time
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunitySummaryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reports/efficacySummary:
+    get:
+      summary: Retrieve a summary of the process efficacy in the system.
+      description: |
+        Retrieve a list of the process efficacy in the system.
+        <br><b>Authorization:</b>All logged-in users are allowed to perform this operation.
+        <br><b>Implementation Notes:</b>
+        <ul>
+          <li>The main table to use is opportunity table.</li>
+        </ul>
+      tags:
+        - Reports
+      operationId: getProcessEfficacyReport
+      parameters:
+        - name: dateStart
+          in: query
+          required: false
+          description: Filter by start date.
+          schema:
+            type: string
+            format: date-time
+        - name: dateEnd
+          in: query
+          required: false
+          description: Filter by end date.
+          schema:
+            type: string
+            format: date-time
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ProcessEfficacyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reports/throughput:
+    get:
+      summary: Retrieve the operation throughput in the system, grouped by specific time period.
+      description: |
+        Retrieve the operation throughput in the system, grouped by specific time period.
+      tags:
+        - Reports
+      operationId: getThroughputReport
+      parameters:
+        - name: grouping
+          in: query
+          required: true
+          description: The grouping to use.
+          schema:
+            type: string
+            enum: ['Monthly', 'Quarterly', 'Yearly']
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataItemArrayResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reports/implementation:
+    get:
+      summary: Retrieve the implementation count in the system, grouped by source.
+      description: |
+        Retrieve the operation throughput in the system, grouped by specific time period.
+      tags:
+        - Reports
+      operationId: getImplementationReport
+      parameters:
+        - name: dateStart
+          in: query
+          required: false
+          description: Filter by start date.
+          schema:
+            type: string
+            format: date-time
+        - name: dateEnd
+          in: query
+          required: false
+          description: Filter by end date.
+          schema:
+            type: string
+            format: date-time
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataItemArrayResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the opportunity details as well as associated phases and discussion with given opportunity id.
+      description: |
+        This method will retrieve the opportunity details as well as associated phases and discussion with
+        given opportunity id.
+      tags:
+        - Opportunities
+      operationId: getOpportunityCompleteById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref:  '#/components/responses/OpportunityCompleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Delete the given opportunity.
+      description: |
+        This method will delete the opportunity with given id. Only the owner is allowed to delete the opportunity.
+      tags:
+        - Opportunities
+      operationId: deleteOpportunity
+      security:
+        - bearer: []
+      responses:
+        '204':
+          $ref:  '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/details:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the opportunity details for given opportunity id.
+      description: |
+        This method will retrieve the opportunity details for given opportunity id.
+      tags:
+        - Opportunities
+      operationId: getOpportunityDetailsById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref:  '#/components/responses/OpportunityDetailsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Edit the opportunity details for given opportunity.
+      description: |
+        This method will edit the opportunity details for the given opportunity.  Only the owner is allowed to perform
+        this operation.
+      tags:
+        - Opportunities
+      operationId: editOpportunityById
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrEditOpportunityRequest'
+      responses:
+        '200':
+          $ref:  '#/components/responses/OpportunityDetailsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/phases:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the opportunity phases for given opportunity id.
+      description: |
+        This method will retrieve the opportunity phases for given opportunity id.
+      tags:
+        - Opportunities
+      operationId: getOpportunityPhasesById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunityPhaseArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Change the active phase of the opportunity.
+      description: |
+        Change the active phase of the opportunity.  This will create a new phase as
+        the new active phase of the opportunity and automatically end the previous phase.
+        All existing phases will be returned by the method after the new phase has been
+        added.
+      tags:
+        - Opportunities
+      operationId: addOpportunityPhase
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPhaseRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunityPhaseArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/members:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the team members for given opportunity id.
+      description: |
+        This method will retrieve the team members for given opportunity id.
+      tags:
+        - Opportunities
+      operationId: getOpportunityMembersById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunityTeamMembersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Update the list of team members for given opportunity id.
+      description: |
+        This method will update the team members for given opportunity id.  Only the owner of the
+        opportunity is allowed to perform this action.
+      tags:
+        - Opportunities
+      operationId: updateOpportunityMembersById
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOpportunityMembersRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/discussionPosts:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the discussion posts for given opportunity id.
+      description: |
+        This method will retrieve the discussion posts for given opportunity id.  Only the top-level
+        posts are returned, and further drilling down will be required if there is a need to access
+        a specific discussion thread.
+      tags:
+        - Opportunities
+        - Discussions
+      operationId: getOpportunityDiscussionsById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref:  '#/components/responses/DiscussionPostArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Add a new top-level discussion post for given opportunity id.
+      description: |
+        This method add a new top-level discussion post for given opportunity id.
+      tags:
+        - Opportunities
+        - Discussions
+      operationId: addTopLevelDiscussionPost
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          $ref:  '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/evaluations:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the evaluations for given opportunity id.
+      description: |
+        This method will retrieve the evaluations for given opportunity id.  Only the summary is provided.
+      tags:
+        - Opportunities
+        - Evaluation
+      operationId: getOpportunityEvaluationById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/EvaluationSummaryArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Provide an evaluation for given opportunity id.
+      description: |
+        This method will provide an evaluation for given opportunity id.  Only team members and the owner are
+        allowed to submit an evaluation.  An evaluation item should be provided for each criterion for the
+        request to be valid.
+      tags:
+        - Opportunities
+        - Evaluation
+      operationId: submitOpportunityEvaluation
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitEvaluationRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/criteria:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the evaluation criteria for given opportunity id.
+      description: |
+        This method will retrieve the evaluation criteria for given opportunity id.  Currently, the implementation will
+        return the same set of evaluation criteria.
+      tags:
+        - Opportunities
+        - Evaluation
+      operationId: getOpportunityCriteriaById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/CriteriaItemArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{opportunityId}/evaluationScoreboard:
+    parameters:
+      - $ref: '#/components/parameters/OpportunityId'
+    get:
+      summary: Retrieve the evaluation scoreboard for given opportunity id.
+      description: |
+        This method will retrieve the evaluation scoreboard for given opportunity id.  It will contain a list
+        of all the evaluation criteria and who voted for each.
+      tags:
+        - Opportunities
+        - Evaluation
+      operationId: getOpportunityEvaluationScoreboardById
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/EvaluationScoreboardResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /lookups/technologyThemes:
+    get:
+      summary: Retrieve the list of technology themes present in the application.
+      description: Retrieve the list of technology themes present in the application.
+      tags:
+        - Lookups
+      operationId: getTechnologyThemesLookup
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/TechnologyThemeArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /lookups/sources:
+    get:
+      summary: Retrieve the list of sources present in the application.
+      description: Retrieve the list of sources present in the application.
+      tags:
+        - Lookups
+      operationId: getSourcesLookup
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/OpportunitySourceArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /lookups/tags:
+    get:
+      summary: Retrieve the list of tags present in the application.
+      description: Retrieve the list of sources present in the application.
+      tags:
+        - Lookups
+      operationId: getTagsLookup
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/TagArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /documents:
+    post:
+      summary: Upload a document
+      description: |
+        Upload a document.
+      tags:
+        - Documents
+      operationId: uploadDocument
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          $ref: '#/components/responses/DocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /documents/{documentId}:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
+    get:
+      summary: Download the document with given id.
+      description: Download the document with given id.
+      tags:
+        - Documents
+      operationId: downloadDocument
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/DownloadedDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Delete the document with given id.
+      description: Delete the document with given id.
+      tags:
+        - Documents
+      operationId: deleteDocument
+      security:
+        - bearer: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /discussionPosts/{discussionPostId}/replies:
+    parameters:
+      - $ref: '#/components/parameters/DiscussionPostId'
+    get:
+      summary: Retrieve the replies for the given discussion post.
+      description: Retrieve the replies for the given discussion post.
+      tags:
+        - Discussions
+      operationId: getDiscussionPostReplies
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/DiscussionPostArrayResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Post a reply for the given discussion post.
+      description: Post a reply for the given discussion post.
+      tags:
+        - Discussions
+      operationId: createDiscussionReply
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /notifications:
+    get:
+      summary: Retrieve the notifications for the logged-in user.
+      description: |
+        Retrieve the notifications for the logged-in user.  Results are always returned
+        from latest to earliest.
+      tags:
+        - Notifications
+      operationId: getNotifications
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      security:
+        - bearer: []
+      responses:
+        '200':
+          $ref: '#/components/responses/NotificationArrayResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /notifications/markAsRead:
+    post:
+      summary: Mark the given notifications as read.
+      description: |
+        Marks the notifications with given ids as read.
+      tags:
+        - Notifications
+      operationId: markNotificationsAsRead
+      security:
+        - bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkNotificationsAsReadRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users:
+    get:
+      summary: Search for users.
+      description: |
+        This will search users based on the user's name.  Partial match
+        is supported.
+      tags:
+        - Users
+      operationId: searchUsers
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+        - in: query
+          name: name
+          required: true
+          description: Search by user name.
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/UserShortArrayResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    page:
+      name: page
+      in: query
+      description: The page number. 1 based.
+      required: false
+      schema:
+        type: integer
+        default: 1
+
+    perPage:
+      name: perPage
+      in: query
+      description: The number of entities shown in one page.
+      required: false
+      schema:
+        type: integer
+        default: 10
+        maximum: 100
+
+    sortBy:
+      name: sortBy
+      in: query
+      description: The field used to sort the results
+      required: false
+      schema:
+        type: string
+        enum: ['ProductName', 'Company', 'TechTheme', 'Status', 'LastUpdated', 'Owner', 'Tags', 'Views']
+
+    sortOrder:
+      name: sortOrder
+      in: query
+      description: The sorting order (asc/desc).
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+
+    OpportunityId:
+      name: opportunityId
+      in: path
+      required: true
+      description: The opportunity id
+      schema:
+        type: integer
+
+    DiscussionPostId:
+      name: discussionPostId
+      in: path
+      required: true
+      description: The discussion post id
+      schema:
+        type: integer
+
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      description: The document id
+      schema:
+        type: integer
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the document.
+        name:
+          type: string
+          description: The name of the document.
+        documentType:
+          type: string
+          description: The MIME type of the document.
+        location:
+          type: string
+          description: The location of the document.
+
+    MarkNotificationsAsReadRequest:
+      type: object
+      properties:
+        notificationIds:
+          type: array
+          items:
+            type: integer
+
+    GraphDataItem:
+      type: object
+      properties:
+        label:
+          type: string
+          description: |
+            The label of this graph data point.
+        value:
+          type: integer
+          description: The data value.
+
+    AddPhaseRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/OpportunityStatus'
+
+    SubmitEvaluationRequest:
+      type: object
+      properties:
+        evaluationScores:
+          type: array
+          description: An array of evaluation scores for each criteria item.
+          items:
+            $ref: '#/components/schemas/CriteriaAnswerItem'
+        evaluationNotes:
+          type: string
+          description: Additional notes provided for evaluation of the opportunity.
+
+    UpdateOpportunityMembersRequest:
+      type: object
+      properties:
+        members:
+          type: array
+          description: A list of user ids that will be members of the given opportunity.
+          items:
+            type: integer
+
+    CreatePostRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The text content of the post.
+
+    CreateOrEditOpportunityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the opportunity.
+        technologyTheme:
+          type: integer
+          description: The technology theme id.
+        company:
+          type: string
+          description: The name of the company associated with this opportunity.
+        source:
+          type: integer
+          description: The source id of the opportunity.
+        description:
+          type: string
+          description: The opportunity description.
+        tags:
+          type: array
+          description: An array of tags associated with the opportunity.
+          items:
+            type: integer
+        supportingDocuments:
+          type: array
+          description: Array pointing to ids of uploaded documents.
+          items:
+            type: number
+        usefulLinks:
+          type: array
+          description: An array of useful links associated with the opportunity.
+          items:
+            type: string
+
+    OpportunityPhase:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The id of the phase.
+        status:
+          type: string
+          description: The status of the phase.
+        startDate:
+          type: string
+          format: date-time
+          description: The start date of the phase.  If the phase has not yet started, this is null.
+        endDate:
+          type: string
+          format: date-time
+          description: The end date of the phase.  If the phase has not yet started, or has not completed, this is null.
+        isActive:
+          type: boolean
+          description: |
+            Indicates whether this is the currently active phase of the opportunity it is associated with.
+
+    OpportunitySummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/OpportunityCounts'
+      example:
+        - grouping: 'Status'
+          counts:
+            - groupName: 'Under Evaluation'
+              count: 30
+            - groupName: 'Evaluation Passed'
+              count: 15
+            - groupName: 'Evaluation Failed'
+              count: 7
+        - grouping: 'Technology'
+          counts:
+            - groupName: 'Construction'
+              count: 60
+            - groupName: 'Energy'
+              count: 30
+            - groupName: 'Planning'
+              count: 30
+        - grouping: 'Source'
+          counts:
+            - groupName: 'Acme Source AAA'
+              count: 45
+            - groupName: 'Acme Source BBB'
+              count: 30
+            - groupName: 'Acme Source CCC'
+              count: 30
+
+    OpportunitySummaryGrouping:
+      type: string
+      enum: ['Status', 'Technology', 'Source']
+
+    OpportunityCounts:
+      type: object
+      description: A list of the opportunity counts grouped by a specific attribute.
+      properties:
+        grouping:
+          $ref: '#/components/schemas/OpportunitySummaryGrouping'
+        counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpportunityCountItem'
+
+    OpportunityCountItem:
+      type: object
+      properties:
+        groupName:
+          type: string
+          description: The name of the attribute used to group this.
+          example: 'Under Evaluation'
+        count:
+          type: integer
+          description: The number of opportunities with this status.
+          example: 30
+
+    UserShort:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The id of the user.
+        name:
+          type: string
+          description: The name of the user.
+        profilePic:
+          type: string
+          description: The profile pic of the user.
+
+    OpportunityComplete:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the opportunity.
+        ownerId:
+          type: integer
+          description: The id of the opportunity owner.
+        opportunityDetails:
+          $ref: '#/components/schemas/OpportunityDetails'
+        opportunityPhases:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpportunityPhase'
+        discussions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscussionPost'
+
+    OpportunityDetailsWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: The id of the opportunity.
+        - $ref: '#/components/schemas/OpportunityDetails'
+
+    OpportunityDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the opportunity.
+        updatedOn:
+          type: string
+          format: date-time
+          description: When the opportunity was last updated.
+        technologyTheme:
+          $ref: '#/components/schemas/TechnologyTheme'
+        company:
+          type: string
+          description: The name of the company.
+        source:
+          $ref: '#/components/schemas/OpportunitySource'
+        description:
+          type: string
+          description: The description of the opportunity.
+        tags:
+          type: array
+          description: The tags associated with the opportunity.
+          items:
+            type: string
+        documents:
+          type: array
+          description: An array of documents associated with the opportunity.
+          items:
+            $ref: '#/components/schemas/OpportunityDocument'
+        links:
+          type: array
+          items:
+            type: string
+
+    OpportunityDocument:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the document.
+        documentType:
+          type: string
+          description: The MIME document type.
+        location:
+          type: string
+          description: A link to access the document.
+
+    DiscussionPost:
+      type: object
+      properties:
+        author:
+          $ref: '#/components/schemas/UserShort'
+        date:
+          type: string
+          format: date-time
+          description: The date of the post.
+        text:
+          type: string
+          description: The text of the post.
+        replyCount:
+          type: number
+          description: The number of replies to this post.
+
+    TechnologyTheme:
+      type: object
+      properties:
+        icon:
+          type: string
+          description: The icon to use for the theme.
+        name:
+          type: string
+          description: The name of the theme.
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the tag.
+        label:
+          type: string
+          description: The label of the tag.
+
+    OpportunitySource:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the source.
+        name:
+          type: string
+          description: The name of the source.
+
+    OpportunityStatus:
+      type: string
+      enum: [ 'UnderEvaluation', 'EvaluationPass', 'EvaluationFail', 'InPilotTest', 'PilotTestPass',
+                'PilotTestFail', 'Implemented' ]
+
+    CriteriaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the questionnaire/criteria item.
+        text:
+          type: string
+          description: The question text.
+
+    CriteriaAnswerItem:
+      type: object
+      properties:
+        criteriaId:
+          type: number
+          description: The id that this answer corresponds to.
+        answerValue:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: The answer provided for this questionnaire/criteria item.
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The notification id.
+        isRead:
+          type: boolean
+          description: Indicates whether this notification has been read or not.
+        text:
+          type: string
+          description: The notification text.
+        notificationType:
+          type: string
+          enum: ["Bottleneck", "Assignment"]
+          description: The notification type.
+        referenceId:
+          type: integer
+          description: The reference id pointing to an object that the notification is about.
+        createdOn:
+          type: string
+          format: date-time
+          description: When the notification was generated.
+
+    OpportunityTeamMembers:
+      type: object
+      description: The team members of a given opportunity.
+      properties:
+        owner:
+          $ref: '#/components/schemas/UserShort'
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+
+    ProcessEfficacy:
+      type: object
+      description: A summary of the process efficacy in the system.
+      properties:
+        successfulImplementation:
+          type: number
+          description: The % of successfully implemented opportunities.
+        avgEvaluationDuration:
+          type: number
+          description: The average number of days to evaluate an opportunity.
+        avgPilotTestDuration:
+          type: number
+          description: The average number of days to performa  pilot test.
+        throughput:
+          type: number
+          description: The monthly opportunity throughput.
+
+    EvaluationSummary:
+      type: object
+      description: The evaluation summary by a team member for a given opportunity.
+      properties:
+        evaluator:
+          $ref: '#/components/schemas/UserShort'
+        score:
+          type: number
+          description: The evaluation score.  Will be null if evaluation not yet submitted.
+        comments:
+          type: string
+          description: The evaluation notes and comments.  Will be null if evaluation not yet submitted.
+
+    EvaluationScoreboard:
+      type: object
+      properties:
+        totalScore:
+          type: number
+          description: The total evaluation score.
+        scoreboardItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvaluationScoreboardItem'
+
+    EvaluationScoreboardItem:
+      type: object
+      description: |
+        The evaluation scoreboard for a given opportunity.  It will contain a list of users who
+        individually voted for each score for a given evaluation criteria.
+      properties:
+        criteriaId:
+          type: integer
+          description: The criteria id that this scoreboard item corresponds to.
+        criteriaText:
+          type: string
+          description: The text for this criterion.
+        stronglyAgree:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+        agree:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+        neutral:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+        disagree:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+        stronglyDisagree:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserShort'
+
+    OpportunitySearchResultItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the opportunity.
+        description:
+          type: string
+          description: The description of the opportunity.
+        name:
+          type: string
+          description: The name of the opportunity.
+        company:
+          type: string
+          description: The company of the opportunity.
+        technologyTheme:
+          $ref: '#/components/schemas/TechnologyTheme'
+        status:
+          $ref: '#/components/schemas/OpportunityStatus'
+        lastUpdatedOn:
+          type: string
+          description: When the opportunity was last updated.
+          format: date-time
+        owner:
+          $ref: '#/components/schemas/UserShort'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        views:
+          type: integer
+          description: The number of views for this opportunity.
+
+  headers:
+    X-Page:
+      schema:
+        type: integer
+      description: Index of the current page (starting at 1)
+    X-Per-Page:
+      schema:
+        type: integer
+      description: Number of items per page
+    X-Prev-Page:
+      schema:
+        type: integer
+      description: Index of the previous page
+    X-Next-Page:
+      schema:
+        type: integer
+      description: Index of the next page
+    X-Total:
+      schema:
+        type: integer
+      description: Total number of items
+    X-Total-Pages:
+      schema:
+        type: integer
+      description: Total number of pages
+    Link:
+      schema:
+        type: string
+      description: Pagination link header
+
+  responses:
+    OpportunitySearchResponse:
+      description: Response that for opportunity search.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/OpportunitySearchResultItem'
+      headers:
+        X-Page:
+          $ref: '#/components/headers/X-Page'
+        X-Per-Page:
+          $ref: '#/components/headers/X-Per-Page'
+        X-Next-Page:
+          $ref: '#/components/headers/X-Next-Page'
+        X-Prev-Page:
+          $ref: '#/components/headers/X-Prev-Page'
+        X-Total:
+          $ref: '#/components/headers/X-Total'
+        X-Total-Pages:
+          $ref: '#/components/headers/X-Total-Pages'
+
+    OpportunitySummaryResponse:
+      description: Response that provides an OpportunitySummary object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpportunitySummary'
+
+    OpportunityTeamMembersResponse:
+      description: Response that provides an OpportunityTeamMembers object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpportunityTeamMembers'
+
+    DownloadedDocumentResponse:
+      description: Response for downloading a Document object.
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+
+    DocumentResponse:
+      description: Response that provides a Document object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Document'
+
+    EvaluationScoreboardResponse:
+      description: Response that provides an EvaluationScoreboard object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EvaluationScoreboard'
+
+    OpportunityCompleteResponse:
+      description: Response that provides an OpportunityComplete object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpportunityComplete'
+
+    ProcessEfficacyResponse:
+      description: Response that provides a ProcessEfficacy object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProcessEfficacy'
+
+    NotificationArrayResponse:
+      description: Response that provides an array of Notification objects
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Notification'
+
+    OpportunityDetailsResponse:
+      description: Response that provides an OpportunityDetails object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpportunityDetails'
+
+    OpportunityDetailsWithIdResponse:
+      description: Response that provides an OpportunityDetailsWithId object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpportunityDetailsWithId'
+
+    OpportunityPhaseArrayResponse:
+      description: Response that provides an array of OpportunityPhase objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/OpportunityPhase'
+
+    DiscussionPostArrayResponse:
+      description: Response that provides an array of DicussionPost objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/DiscussionPost'
+
+    UserShortArrayResponse:
+      description: Response that provides an array of UserShort objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserShort'
+
+    EvaluationSummaryArrayResponse:
+      description: Response that provides an array of EvaluationSummary objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EvaluationSummary'
+
+    CriteriaItemArrayResponse:
+      description: Response that provides an array of CriteriaItem objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CriteriaItem'
+
+    TechnologyThemeArrayResponse:
+      description: Response that provides an array of TechnologyTheme objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TechnologyTheme'
+
+    GraphDataItemArrayResponse:
+      description: Response that provides an array of OpportunityThroughputItem objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GraphDataItem'
+
+    OpportunitySourceArrayResponse:
+      description: Response that provides an array of OpportunitySource objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/OpportunitySource'
+
+    TagArrayResponse:
+      description: Response that provides an array of Tag objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Tag'
+
+    NoContent:
+      description: |
+        The operation completed successfully but no content is needed
+        in the response.
+
+    BadRequest:
+      description: Bad request - Problem with the request (E.g. Missing parameters)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - Token is missing or Invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden - User is not allowed to access this end point
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found - Requested entity is not found in database
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Conflict:
+      description: Conflict - Request creates conflict in database. E.g. Using duplicate names
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal Server Error - Request is valid but operation failed at server side
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

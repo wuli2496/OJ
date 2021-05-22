@@ -1,0 +1,727 @@
+{
+	"info": {
+		"_postman_id": "1be6c3a5-1cbe-491d-b7eb-7bb3693655c9",
+		"name": "hess-opportunity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "lookups",
+			"item": [
+				{
+					"name": "tech themes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/lookups/technologyThemes",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"lookups",
+								"technologyThemes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sources",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/lookups/sources",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"lookups",
+								"sources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tags",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/lookups/tags",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"lookups",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/users?name=u",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "u"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "opportunities",
+			"item": [
+				{
+					"name": "create opportunity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"pm.environment.set('OPPORTUNITY_ID', response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"opp name\",\n  \"techThemeId\": 1,\n  \"company\": \"company 1\",\n  \"sourceId\": 1,\n  \"description\": \"opp description\",\n  \"tags\": [\n    1,2,3\n  ],\n  \"supportingDocuments\": [\n    1,3\n  ],\n  \"usefulLinks\": [\n    \"http://www.abc\",\n    \"http://www.bba.com\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create another opportunit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"pm.environment.set('OPPORTUNITY_ID_2', response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"opp name\",\n  \"techThemeId\": 1,\n  \"company\": \"company 1\",\n  \"sourceId\": 1,\n  \"description\": \"opp description\",\n  \"tags\": [\n    1,2,3\n  ],\n  \"supportingDocuments\": [\n    1,3\n  ],\n  \"usefulLinks\": [\n    \"http://www.abc\",\n    \"http://www.bba.com\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get opportunity",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get opportunity details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/details",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update opportunity details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"opp name updated\",\n  \"techThemeId\": 2,\n  \"company\": \"company 3\",\n  \"sourceId\": 2,\n  \"description\": \"opp description\",\n  \"tags\": [\n    1,2\n  ],\n  \"supportingDocuments\": [\n    3\n  ],\n  \"usefulLinks\": [\n    \"http://www.777.com\",\n    \"http://www.bba.com\",\n    \"http://www.aaaupdated.com\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/details",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search opportunities",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "UnderEvaluation",
+									"disabled": true
+								},
+								{
+									"key": "productName",
+									"value": "opp name",
+									"disabled": true
+								},
+								{
+									"key": "companyName",
+									"value": "company 1",
+									"disabled": true
+								},
+								{
+									"key": "technologyTheme",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "technologyTheme",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "lastUpdatedStart",
+									"value": "2021-05-17T00:45:53.046Z",
+									"disabled": true
+								},
+								{
+									"key": "lastUpdatedEnd",
+									"value": "2021-07-17T00:45:53.046Z",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "ProductName",
+									"disabled": true
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "perPage",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "owner",
+									"value": "testuser",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get opportunity phases",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/phases",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"phases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create opportunity phase",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"EvaluationPass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/phases",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"phases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get opportunity members",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/members",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update opportunity members",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"members\": [1, 2, 3]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/members",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete opportunity",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID_2}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID_2}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "discussion_posts",
+			"item": [
+				{
+					"name": "create discussion post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"this a post\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/discussionPosts",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"discussionPosts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get discussion posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/opportunities/{{OPPORTUNITY_ID}}/discussionPosts",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"opportunities",
+								"{{OPPORTUNITY_ID}}",
+								"discussionPosts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get discussion post replies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/discussionPosts/1/replies",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"discussionPosts",
+								"1",
+								"replies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create discussion post reply",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"this a another post reply\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/discussionPosts/1/replies",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"discussionPosts",
+								"1",
+								"replies"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "opportunity-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "init-db": "node src/scripts/init-db.js",
+    "data:export": "node src/scripts/exportData.js",
+    "data:import": "node src/scripts/importData.js",
+    "test": "mocha test/unit/*.test.js --timeout 30000 --require test/prepare.js --exit",
+    "cov": "nyc --reporter=html --reporter=text npm run test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@okta/jwt-verifier": "^2.1.0",
+    "config": "^3.3.6",
+    "cors": "^2.8.5",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "get-parameter-names": "^0.3.0",
+    "http-status": "^1.5.0",
+    "joi": "^17.4.0",
+    "lodash": "^4.17.21",
+    "mssql": "^7.1.0",
+    "prompt-confirm": "^2.0.4",
+    "querystring": "^0.2.1",
+    "sequelize": "^6.6.2",
+    "tedious": "^11.0.8",
+    "util": "^0.12.3",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
+    "nodemon": "^2.0.7",
+    "nyc": "^15.1.0",
+    "sinon": "^10.0.0",
+    "standard": "^16.0.3"
+  },
+  "standard": {
+    "ignore": [
+      "/docs"
+    ],
+    "env": [
+      "mocha"
+    ]
+  },
+  "nyc": {
+    "exclude": [
+      "src/helpers/logger.js",
+      "test/unit/**"
+    ]
+  }
+}

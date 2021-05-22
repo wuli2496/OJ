@@ -1,0 +1,125 @@
+{
+    "Criteria": [],
+    "DiscussionPost": [],
+    "Document": [
+        {
+            "id": 1,
+            "name": "Document-1",
+            "documentType": "type-1",
+            "location": "location-1"
+        },
+        {
+            "id": 2,
+            "name": "Document-2",
+            "documentType": "type-2",
+            "location": "location-2"
+        },
+        {
+            "id": 3,
+            "name": "Document-1",
+            "documentType": "type-2",
+            "location": "location-2"
+        }
+    ],
+    "Evaluation": [],
+    "EvaluationResponse": [],
+    "Opportunity": [],
+    "OpportunityDocument": [],
+    "OpportunityLink": [],
+    "OpportunityMembers": [],
+    "OpportunityPhase": [],
+    "OpportunityTag": [],
+    "OpportunityViews": [],
+    "Source": [
+        {
+            "id": 1,
+            "name": "Source-1"
+        },
+        {
+            "id": 2,
+            "name": "Source-2"
+        },
+        {
+            "id": 3,
+            "name": "Source-3"
+        },
+        {
+            "id": 4,
+            "name": "Source-4"
+        },
+        {
+            "id": 5,
+            "name": "Source-5"
+        },
+        {
+            "id": 6,
+            "name": "Source-6"
+        }
+    ],
+    "Tag": [
+        {
+            "id": 1,
+            "label": "Tag-1"
+        },
+        {
+            "id": 2,
+            "label": "Tag-2"
+        },
+        {
+            "id": 3,
+            "label": "Tag-3"
+        },
+        {
+            "id": 4,
+            "label": "Tag-4"
+        },
+        {
+            "id": 5,
+            "label": "Tag-5"
+        },
+        {
+            "id": 6,
+            "label": "Tag-6"
+        }
+    ],
+    "TechTheme": [
+        {
+            "id": 1,
+            "icon": "Icon-1",
+            "name": "Name-1"
+        },
+        {
+            "id": 2,
+            "icon": "Icon-2",
+            "name": "Name-2"
+        },
+        {
+            "id": 3,
+            "icon": "Icon-3",
+            "name": "Name-3"
+        },
+        {
+            "id": 4,
+            "icon": "Icon-4",
+            "name": "Name-4"
+        },
+        {
+            "id": 5,
+            "icon": "Icon-5",
+            "name": "Name-5"
+        },
+        {
+            "id": 6,
+            "icon": "Icon-6",
+            "name": "Name-6"
+        }
+    ],
+    "User": [
+        {
+            "id": 1,
+            "name": "emre",
+            "profilePicture": "picture",
+            "oktaUsername": "emre.isbilir@gmail.com"
+        }
+    ]
+}

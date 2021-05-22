@@ -1,0 +1,12 @@
+I did not prepare postman tests because it was not in scope.
+If you want to test the endpoints with postman you have to provide valid access tokens for authorization.
+If you want to bypass the authorization for testing purposes, i suggest this way:
+- comment out line at `routes.js#36`: `authenticator(req, res, next)`
+- add this line of code before `next()` statement to `routes.js#37`: req.authUser = { uid: '00uqmq050xZZfddgc5d6', username: 'emre.isbilir@gmail.com', scopes: ['openid'], jwtToken: 'eyJ' }
+- final code block will be like this:
+if (def.auth) {
+        actions.push((req, res, next) => {
+          // authenticator(req, res, next)
+          req.authUser = { uid: '00uqmq050xZZfddgc5d6', username: 'emre.isbilir@gmail.com', scopes: ['openid'], jwtToken: 'eyJr' }
+          next()
+        })

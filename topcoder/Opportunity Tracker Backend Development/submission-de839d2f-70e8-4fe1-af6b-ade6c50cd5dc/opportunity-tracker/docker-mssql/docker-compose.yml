@@ -1,0 +1,14 @@
+version: "3"
+services:
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2019-latest" # use latest official mssql version
+    env_file:
+      - database.env # configure mssql
+    ports:
+      - "1433:1433"
+    volumes:
+      - type: volume
+        source: data
+        target: /var/opt/mssql
+volumes:
+  data:

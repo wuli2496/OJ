@@ -1,0 +1,27 @@
+version: "3"
+services:
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2019-latest" # use latest official mssql version
+    env_file:
+      - database.env # configure mssql
+    ports:
+      - "1433:1433"
+    volumes:
+      - type: volume
+        source: data
+        target: /var/opt/mssql
+  opportunity-tracker-api:
+    container_name: opportunity-tracker-api
+    image: opportunity-tracker-api:latest
+    ports:
+      - "3000:3000"
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    env_file:
+      - api.env
+    command: run start
+    depends_on:
+      - mssql
+volumes:
+  data:
