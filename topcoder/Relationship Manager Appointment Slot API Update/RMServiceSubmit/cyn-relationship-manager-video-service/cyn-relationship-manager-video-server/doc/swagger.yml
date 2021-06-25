@@ -1,0 +1,802 @@
+openapi: 3.0.1
+info:
+  title: Relationship Manager Video Service
+  description: Relationshp Manager Video Service
+  version: 1.0.0
+servers:
+  - url: https://{subdomain}.{secondleveldomain}.{topleveldomain}:{port}/v1/conferencing/service/customer/rm
+    variables:
+      subdomain:
+        description: A subdomain in a URL indicates which particular page of your website the web browser should serve up
+        default: Sub Domain
+      secondleveldomain:
+        description: Your second-level domain (SLD) is the name of your website. It helps people know they’re visiting a certain brand’s site.
+        default: Second-level Domain
+      topleveldomain:
+        description: The top-level domain (TLD) specifies what type of entity your organization registers as on the internet.
+        default: Top-level Domain
+      port:
+        description: Please change as per need
+        default: "443"
+        enum:
+          - "443"
+          - "8443"
+tags:
+  - name: rm-video
+    description: RM video endpoints for managing video sessions.
+paths:
+  /v1/conferencing/service/customer/rm/sessions:
+    get:
+      tags:
+        - rm-video
+      description: Get the associated session id for the given appointment id.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: appointmentId
+          in: query
+          description: id of the appointment the session is associated with
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        "200":
+          description: OK, a SessionDTO is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+    post:
+      tags:
+        - rm-video
+      description: Create a new DB session for the given appointment. Calling with the same appointment id will return the same session id.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Create session payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentDTO'
+        required: true
+      responses:
+        "200":
+          description: OK, a SessionDTO is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/streams/{sessionId}:
+    get:
+      tags:
+        - rm-video
+      description: Starts a video session
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: sessionId
+          in: path
+          description: id of the session to start the video on
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/leaveSession:
+    post:
+      tags:
+        - rm-video
+      description: Leave session based on the provided session id.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Leave session payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/guests:
+    post:
+      tags:
+        - rm-video-guest-public
+      description: Validate session and create a guest record. |
+        Token is not generated here. This is a Public URL.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Create guest payload. Only session id must be present.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestDTO'
+      responses:
+        "200":
+          description: OK. Return a GuestDTO response with session id and guest id only.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+    get:
+      tags:
+        - rm-video-guest
+      description: Get lists of non expired Guests. Only Relationship Manager. |
+        Must belong to relationship_manager group (check ID token).
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: The guest status. If not provided, use Pending. 
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum: [Accepted, Rejected, Pending]
+            default: Pending
+      responses:
+        "200":
+          description: OK. Return a list of non expired GuestDTO response without token.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized. Max guests reached
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/guests/{guestId}:
+    get:
+      tags:
+        - rm-video-guest-public
+      description: Use guest id. Return token in GuestDTO. This is a public URL.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: id of the guest
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK. Return a GuestDTO response including token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized. Max guests reached
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/guests/{guestId}/streams:
+    get:
+      tags:
+        - rm-video-guest
+      description: Starts a video session by a guest. Change guest status to Used.
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation-guest
+          in: header
+          description: Guest token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: id of the guest to start the video on
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/guests/{guestId}/accept:
+    put:
+      tags:
+        - rm-video-guest
+      description: Accepts guest. Only Relationship Manager. |
+        Must belong to relationship_manager group (check ID token).
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: id of the guest
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+  /v1/conferencing/service/customer/rm/guests/{guestId}/reject:
+    put:
+      tags:
+        - rm-video-guest
+      description: Rejects guest. Only Relationship Manager. |
+        Must belong to relationship_manager group (check ID token).
+      parameters:
+        - name: x-app
+          in: header
+          description: Unique App id as required to retrieve the Key
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-guid
+          in: header
+          description: Guid of the application
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-rhythm
+          in: header
+          description: 'Rhythm key '
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-authorisation
+          in: header
+          description: JWT token
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-cyn-event
+          in: header
+          description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: id of the guest
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "500":
+          description: Internal server error
+          content: {}
+components:
+  schemas:
+    AppointmentDTO:
+      title: AppointmentDTO
+      required:
+        - appointmentId
+      type: object
+      properties:
+        appointmentId:
+          type: number
+          format: int64 
+    GuestDTO:
+      title: GuestDTO
+      required:
+        - sessionId
+        - name
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Guest's name
+          example: John Smith
+        guestId:
+          type: string
+          format: uuid
+        token:
+          type: string 
+          description: 160-bit (20 byte) random value base64 encoded
+          example: Xl3S2itovd5CDS7cKSNvml4_ODA
+    SessionDTO:
+      title: SessionDTO
+      required:
+        - sessionId
+        - token
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        token:
+          type: string
+    GenericResponse:
+      title: GenericResponse
+      type: object
+      properties:
+        body:
+          type: object
+          properties: {}
+        status:
+          $ref: '#/components/schemas/Status'
+    Status:
+      title: Status
+      type: object
+      properties:
+        apiCode:
+          type: string
+        code:
+          type: string
+        errorCode:
+          type: string
+        internalMessage:
+          type: string
+        message:
+          type: string

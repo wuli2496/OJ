@@ -1,0 +1,21 @@
+cache:
+  key: "CI_PROJECT_ID-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .m2
+
+variables:
+  SONAR_TOKEN: $SONAR_TOKEN
+  SONAR_HOST_URL: $SONAR_HOST
+  GIT_DEPTH: 0
+
+stages:
+  - mavenbuild
+
+Maven Package 📦:
+  stage: mavenbuild
+  image: maven:3.6.3-jdk-11
+  script:
+    - mvn -s ci_settings.xml deploy verify sonar:sonar -Dsonar.qualitygate.wait=true
+  only:
+    - master
+    - develop

@@ -1,0 +1,2053 @@
+{
+	"info": {
+		"_postman_id": "ac8e56b2-7faf-417c-9bd3-2d25d1dca4ac",
+		"name": "RM Video Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Openvidu Webhook",
+			"item": [
+				{
+					"name": "Sesssion Destroyed",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "MY_API_TOKEN",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sessionId\": \"18593ea3-662d-4210-acb6-ff4b007dc6f3\",\n    \"timestamp\": 1616282349390,\n    \"startTime\": 1616282347406,\n    \"duration\": 1,\n    \"reason\": \"lastParticipantLeft\",\n    \"event\": \"sessionDestroyed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/openvidu/webhook",
+							"host": [
+								"{{SERVICE_URL}}"
+							],
+							"path": [
+								"v1",
+								"conferencing",
+								"service",
+								"customer",
+								"rm",
+								"openvidu",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unauthorized",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/openvidu/webhook",
+							"host": [
+								"{{SERVICE_URL}}"
+							],
+							"path": [
+								"v1",
+								"conferencing",
+								"service",
+								"customer",
+								"rm",
+								"openvidu",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Method not allowed",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "MY_API_TOKEN",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/openvidu/webhook",
+							"host": [
+								"{{SERVICE_URL}}"
+							],
+							"path": [
+								"v1",
+								"conferencing",
+								"service",
+								"customer",
+								"rm",
+								"openvidu",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Session Created",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sessionId\": \"18593ea3-662d-4210-acb6-ff4b007dc6f3\",\n    \"timestamp\": 1616282098336,\n    \"event\": \"sessionCreated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": null
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Video session - Old Appointment date",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"appointmentId\": 3",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('old_sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Video session - Another User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"appointmentId\": 1",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('otheruser_sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Video session - Invalid Mode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"appointmentId\": 4",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('invalid_mode_sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Video session - UnConfirmed Status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"appointmentId\": 2",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('unconfirmed_sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Video session - Invalid appointment Id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"appointmentId\": 20000000",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('nonexist_sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Video session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"        var playload = {",
+							"            \"appointmentId\": 5",
+							"        };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stream Video Session - Old Appointment date",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/streams/{{old_sessionId}}",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"streams",
+						"{{old_sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stream Video Session - Invalid Mode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/streams/{{invalid_mode_sessionId}}",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"streams",
+						"{{invalid_mode_sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stream Video Session - Unconfirmed Status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/streams/{{unconfirmed_sessionId}}",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"streams",
+						"{{unconfirmed_sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stream Video Session - Invalid appointment Id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/streams/{{nonexist_sessionId}}",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"streams",
+						"{{nonexist_sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stream Video Session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('token', JSON.parse(decrypted).body.token);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/streams/{{sessionId}}",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"streams",
+						"{{sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2);",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.expect(JSON.parse(decrypted).body.sessionId).to.equal(pm.environment.get('sessionId'));",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions?appointmentId=5",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					],
+					"query": [
+						{
+							"key": "appointmentId",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Session - No appoinemntId",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2);",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.expect(JSON.parse(decrypted).body.sessionId).to.equal(pm.environment.get('sessionId'));",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Session Not Found",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var payloadString = '{}';",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2);",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    ",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/sessions?appointmentId=999",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"sessions"
+					],
+					"query": [
+						{
+							"key": "appointmentId",
+							"value": "999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Leave Session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function encryptPayload() {",
+							"    eval(pm.environment.get(\"forgeJS\"));",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var playload = {",
+							"        \"sessionId\": pm.environment.get(\"sessionId\"),",
+							"        \"token\": pm.environment.get(\"token\")",
+							"    };",
+							"    var payloadString = JSON.stringify(playload);",
+							"    var publicKey = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----\\n' + pm.environment.get(\"PUBLIC_KEY\") + \"\\n\" + '-----END PUBLIC KEY-----');",
+							"    var encryptedSymetricKey = publicKey.encrypt(key)",
+							"    pm.environment.set('x-rhythm', forge.util.encode64(encryptedSymetricKey))",
+							"    var cipher = forge.cipher.createCipher('AES-CBC', key);",
+							"    cipher.start({iv: iv});",
+							"    cipher.update(forge.util.createBuffer(payloadString));",
+							"    cipher.finish();",
+							"    var encryptedBody = cipher.output;",
+							"    console.log(forge.util.encode64(encryptedBody.data))",
+							"    pm.environment.set('payload', forge.util.encode64(encryptedBody.data))",
+							"}",
+							"if (!pm.environment.get(\"forgeJS\")) {",
+							"    pm.sendRequest(\"https://raw.githubusercontent.com/loveiset/RSAForPostman/master/forge.js\", (err, res) => {",
+							"        console.log(res)",
+							"        if (err) {",
+							"            console.log(err);",
+							"        } else {",
+							"            pm.environment.set(\"forgeJS\", res.text());",
+							"            encryptPayload();",
+							"        }",
+							"    });",
+							"} else {",
+							"    encryptPayload();",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var decrypted = '';",
+							"var text = pm.response.text();",
+							"if (text && text.startsWith('{')) {",
+							"    decrypted = text",
+							"} else {",
+							"    eval(pm.environment.get(\"forgeJS\"))",
+							"    var iv = 'AODVNUASDNVVAOVF';",
+							"    var key = 'mykey@91mykey@91';",
+							"    var decipher = forge.cipher.createDecipher('AES-CBC', key);",
+							"    decipher.start({iv: iv});",
+							"    decipher.update(forge.util.createBuffer(forge.util.decode64(text)));",
+							"    var result = decipher.finish();",
+							"    console.log(decipher.output.data);",
+							"    decrypted = JSON.stringify(JSON.parse(decipher.output.data), null, 2)",
+							"}",
+							"if(JSON.parse(decrypted).body) {",
+							"    pm.environment.set('sessionId', JSON.parse(decrypted).body.sessionId);",
+							"}",
+							"var template = `",
+							"    <pre>{{response}}</pre>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: decrypted",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-authorisation",
+						"type": "text",
+						"value": "{{Access_Token}}"
+					},
+					{
+						"key": "x-guid",
+						"type": "text",
+						"value": "{{GUID}}"
+					},
+					{
+						"key": "x-rhythm",
+						"type": "text",
+						"value": "{{x-rhythm}}"
+					},
+					{
+						"key": "x-app",
+						"type": "text",
+						"value": "{{APP_ID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVICE_URL}}/v1/conferencing/service/customer/rm/leaveSession",
+					"host": [
+						"{{SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"conferencing",
+						"service",
+						"customer",
+						"rm",
+						"leaveSession"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,15 @@
+.DS_Store
+# Ignore /target folder, which hosts build artifacts
+target/
+# Ignore local Maven repository
+.m2/
+
+#Ignore IDE
+*.iml
+.idea
+
+.classpath
+.factorypath
+.project
+.settings/
+

@@ -1,0 +1,1304 @@
+openapi: 3.0.1
+info:
+  title: Relationship Manager Appointment Service
+  description: Relationshp Manager Appointment Service
+  version: 1.0.0
+servers:
+  - url: https://{subdomain}.{secondleveldomain}.{topleveldomain}:{port}/v1/conferencing/service/customer/rm
+    variables:
+      subdomain:
+        description: A subdomain in a URL indicates which particular page of your website the web browser should serve up
+        default: Sub Domain
+      secondleveldomain:
+        description: Your second-level domain (SLD) is the name of your website. It helps people know they’re visiting a certain brand’s site.
+        default: Second-level Domain
+      topleveldomain:
+        description: The top-level domain (TLD) specifies what type of entity your organization registers as on the internet.
+        default: Top-level Domain
+      port:
+        description: Please change as per need
+        default: "443"
+        enum:
+          - "443"
+          - "8443"
+tags:
+  - name: slots
+    description: Relationship manager slots CRUD API
+  - name: appointments
+    description: Relationship manager appointments CRUD API
+  - name: manager-ratings
+    description: Relationship manager ratings CRUD API
+  - name: attachments
+    description: Appointment attachments API
+paths:
+  /v1/appointments/service/customer/appointments:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+    post:
+      tags:
+        - appointments
+      description: Creates an Appointment
+      operationId: createAppointment
+      requestBody: 
+        description: create appointment request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequestDTO'
+      responses: 
+        200:
+          description: Appointment created successfully
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    get:
+      tags:
+        - appointments
+      description: Get all appointments for the loggged-in user
+      operationId: getAllAppointments
+      parameters:
+        - $ref: '#/components/parameters/skip'
+        - $ref: '#/components/parameters/limit'
+      responses: 
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentListResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/appointments/{appointmentId}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/appointmentId'
+    get:
+      tags:
+        - appointments
+      description: Get appointment by id
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    put:
+      tags:
+        - appointments
+      description: Update appointment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    delete:
+      tags:
+        - appointments
+      description: Delete appointment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/attachments/appointments/{appointmentId}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/appointmentId'
+    post:
+      tags:
+        - attachments
+      description: Upload attachment to appointment
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/AttachmentRequestDTO'
+        required: true
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/AttachmentResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/attachments/{attachmentId}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/attachmentId'
+    get:
+      tags:
+        - attachments
+      description: Get attachment by id
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/AttachmentResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    delete:
+      tags:
+        - attachments
+      description: Delete appointment by id
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/manager-ratings:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+    post:
+      tags:
+        - manager-ratings
+      description: Create manager rating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ManagerRatingDTO'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ManagerRatingResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    get:
+      tags:
+        - manager-ratings
+      description: Get all manager ratings
+      parameters:
+        - $ref: '#/components/parameters/managerName'
+        - $ref: '#/components/parameters/skip'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/PaginatedManagerRatingListResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/manager-ratings/{ratingId}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/ratingId'
+    get:
+      tags:
+        - manager-ratings
+      description: Get manager rating by id
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ManagerRatingResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    put:
+      tags:
+        - manager-ratings
+      description: Update manager ratings
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ManagerRatingDTO'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerRatingResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    delete:
+      tags:
+        - manager-ratings
+      description: Delete manager rating by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/manager-slots:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+    post:
+      tags:
+        - manager-slots
+      description: Create manager slot
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ManagerSlotDTO'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerSlotResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    get:
+      tags:
+        - manager-slots
+      description: Get all manager slots
+      parameters:
+        - $ref: '#/components/parameters/managerName'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerSlotListResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/manager-slots/{slotId}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/slotId'
+    get:
+      tags:
+        - manager-slots
+      description: Get manager slot by id
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ManagerSlotResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    put:
+      tags:
+        - manager-slots
+      description: Update manager slot by id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ManagerSlotDTO'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerSlotResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+    delete:
+      tags:
+        - manager-slots
+      description: Delete manager slot by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        404:
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+  /v1/appointments/service/customer/manager-slots/manager/{managerName}:
+    parameters:
+      - $ref: '#/components/parameters/x-app'
+      - $ref: '#/components/parameters/x-authorisation'
+      - $ref: '#/components/parameters/x-cyn-event'
+      - $ref: '#/components/parameters/x-guid'
+      - $ref: '#/components/parameters/x-rhythm'
+      - $ref: '#/components/parameters/managerNameInPath'
+    get:
+      tags:
+        - manager-slots
+      description: Get a manager's slot availability for a given day
+      parameters:
+        - name: day
+          in: query
+          description: day to query
+          required: true
+          schema: 
+            type: string
+            format: date
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ManagerSlotAvailabilityResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        403:
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        500:
+          description: Internal Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+components:
+  parameters:
+    appointmentId:
+      name: appointmentId
+      in: path
+      description: appointment id
+      schema:
+        type: integer
+        format: int64
+      required: true
+    attachmentId:
+      name: attachmentId
+      in: path
+      description: attachment id
+      schema:
+        type: integer
+        format: int64
+      required: true
+    managerName:
+      name: manager
+      in: query
+      description: optional manager name in query
+      schema:
+        type: string
+      required: false
+    managerNameInPath:
+      name: managerName
+      in: path
+      description: manager name
+      schema:
+        type: string
+      required: true
+    skip:
+      name: skip
+      in: query
+      description: number of rows to skip
+      schema: 
+        type: integer
+      required: true
+    limit:
+      name: limit
+      in: query
+      description: number of rows to return
+      schema:
+        type: integer
+      required: true
+    ratingId:
+      name: ratingId
+      in: path
+      description: manager rating id
+      schema:
+        type: integer
+      required: true
+    slotId:
+      name: slotId
+      in: path
+      description: manager slot id
+      schema:
+        type: integer
+      required: true
+    x-app:
+      name: x-app
+      in: header
+      description: Unique App id as required to retrieve the Key
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    x-guid:
+      name: x-guid
+      in: header
+      description: Guid of the application
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    x-rhythm:
+      name: x-rhythm
+      in: header
+      description: 'Rhythm key '
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    x-authorisation:
+      name: x-authorisation
+      in: header
+      description: JWT token
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    x-cyn-event:
+      name: x-cyn-event
+      in: header
+      description: Cyn Event -> MARKETING_EVENT:MARKETING_PREFRENCES_REGISTER
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    AppointmentMode:
+      type: string
+      enum:
+        - Video
+        - Phone
+        - Branch
+        - Home
+        - Other
+    AppointmentStatus:
+      type: string
+      enum:
+        - Pending
+        - Confirmed
+        - Deleted
+        - Rejected
+        - Canceled
+    AttachmentRequestDTO:
+      description: Attachment upload request dto
+      type: object
+      required: 
+        - fileName
+        - content
+      properties: 
+        fileName:
+          type: string
+        content:
+          type: string
+    AttachmentDTO:
+      description: Attachment dto
+      type: object
+      required: 
+        - id
+        - url
+        - fileName
+        - appointmentId
+        - cratedDate
+      properties: 
+        id: 
+          type: integer
+          format: int64
+        url:
+          type: string
+        fileName:
+          type: string
+        appointmentId:
+          type: integer
+          format: int64
+        cratedDate:
+          type: string
+          format: date-time
+    AppointmentRequestDTO:
+      title: Appointment request dto
+      description: Request to create a new Appointment
+      type: object
+      required:
+        - managerSlotIds
+        - subject
+        - appointmentDate
+        - mode
+      properties:
+        managerSlotIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        subject:
+          type: string
+        description:
+          type: string
+        appointmentDate:
+          type: string
+          format: date-time
+          example: 2021-05-31T00:15:08.693505+05:30
+        mode:
+          $ref: '#/components/schemas/AppointmentMode'
+        address:
+          type: string
+    AppointmentDTO:
+      title: Appointment DTO
+      description: The appointment
+      type: object
+      required:
+        - id
+        - subject
+        - appointmentDate
+        - userName
+        - managerName
+        - mode
+      properties:
+        id:
+          type: integer
+          format: int64
+        subject:
+          type: string
+        description:
+          type: string
+        appointmentDate:
+          type: string
+          format: date-time
+        userName:
+          type: string
+        managerName:
+          type: string
+        mode:
+          $ref: '#/components/schemas/AppointmentMode'
+        status:
+          $ref: '#/components/schemas/AppointmentStatus'
+        address:
+          type: string
+        cancelationReason:
+          type: string
+        newDate:
+          type: string
+          format: date-time
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentDTO'
+    ManagerRatingDTO:
+      title: Manager rating dto
+      description: Manager rating DTO
+      type: object
+      required: 
+        - id
+        - managerName
+        - userName
+        - rating
+        - feedback
+        - createdDate
+      properties: 
+        id:
+          type: integer
+          format: int64
+        managerName:
+          type: string
+        userName:
+          type: string
+        rating:
+          type: integer
+          format: int32
+        feedback:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+    ManagerSlotDTO:
+      title: Manager slot dto
+      type: object
+      required: 
+        - startTime
+        - endTime
+        - managerName
+      properties: 
+        id:
+          type: integer
+          format: int64
+        startTime:
+          type: integer
+          minimum: 0
+          maximum: 86400
+        endTime:
+          type: integer
+          minimum: 0
+          maximum: 86400
+        managerName:
+          type: string
+    SlotAvailabilityDTO:
+      title: Slot availability dto
+      type: object
+      required: 
+        - date
+        - slots
+      properties: 
+        date:
+          type: string
+          format: date
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/SlotDTO'
+    SlotDTO:
+      type: object
+      properties:
+        startTime:
+          type: integer
+        endTime:
+          type: integer
+        status:
+          type: string
+          enum:
+            - available
+            - unavailable
+    PaginatedAppointmentList:
+      title: Paginated appointment list
+      type: object
+      properties: 
+        total:
+          type: integer
+          format: int64
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDTO'
+    PaginatedManagerRatingList:
+      title: Paginated manager rating list
+      type: object
+      properties: 
+        total:
+          type: integer
+          format: int64
+        rows:
+          type: array
+          items: 
+            $ref: '#/components/schemas/ManagerRatingDTO'
+    AppointmentResponse:
+      title: Appointment response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/AppointmentDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    PaginatedAppointmentListResponse:
+      title: Paged Appointment list response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/PaginatedAppointmentList'
+        status:
+          $ref: '#/components/schemas/Status'
+    AttachmentResponse:
+      title: Attachment response
+      type: object
+      properties: 
+        body:
+          $ref: '#/components/schemas/AttachmentDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    ManagerRatingResponse:
+      title: Manager rating response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/ManagerRatingDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    PaginatedManagerRatingListResponse:
+      title: Paged manager rating list response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/PaginatedManagerRatingList'
+        status:
+          $ref: '#/components/schemas/Status'
+    ManagerSlotListResponse:
+      title: Manager slot list response
+      type: object
+      properties:
+        body:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagerSlotDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    ManagerSlotResponse:
+      title: Manager slot response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/ManagerSlotDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    ManagerSlotAvailabilityResponse:
+      title: Manager slot availability response
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/SlotAvailabilityDTO'
+        status:
+          $ref: '#/components/schemas/Status'
+    GenericResponse:
+      title: Generic response
+      type: object
+      properties: 
+        body:
+          type: object
+          properties: {}
+        status:
+          $ref: '#/components/schemas/Status'
+    Status:
+      title: Status
+      type: object
+      properties:
+        apiCode:
+          type: string
+        code:
+          type: string
+        errorCode:
+          type: string
+        internalMessage:
+          type: string
+        message:
+          type: string
