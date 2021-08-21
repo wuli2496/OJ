@@ -1,24 +1,23 @@
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.io.BufferedInputStream;
 
 public class Main {
-	
 	public static void main(String[] args) throws IOException {
 		Scanner scanner;
 		
 		PrintWriter printWriter = new PrintWriter(new BufferedOutputStream(System.out));
 		
 		if (DEBUG) {
-			scanner = new Scanner(new BufferedInputStream(new FileInputStream("/home/wl/OJ/OJ/UVa/uvain")));
+			scanner = new Scanner(new BufferedInputStream(new FileInputStream("f:\\OJ\\uva_in.txt")));
 		} else {
 			scanner = new Scanner(System.in);
 		}
@@ -62,6 +61,7 @@ public class Main {
 		int[][][] puzzles = new int[n][][];
 		for (int i = 0; i < n; ++i) {
 			puzzles[i] = scanLineFill(polygons.get(i));
+			//System.out.println(Arrays.deepToString(puzzles[i]));
 		}
 		return false;
 	}
@@ -72,42 +72,54 @@ public class Main {
 		int xmin = polygon.points.stream().map(Point::getX).min(Integer::compare).get();
 		int xmax = polygon.points.stream().map(Point::getX).max(Integer::compare).get();
 		
+		//System.out.println("ymax:"+ ymax + " ymin:" + ymin);
 		List<Edge>[] netEdges;
-		List[] originLists = new List[ymax - ymin];
-		for (int y = ymin; y < ymax; ++y) {
+		List[] originLists = new List[ymax - ymin + 1];
+		for (int y = ymin; y <= ymax; ++y) {
 			originLists[y - ymin] = new ArrayList<>(); 
 		}
 		netEdges = (List<Edge>[])originLists;
 		initScanLineNewEdgeTable(netEdges, polygon, ymin, ymax);
-		return calFill(netEdges, ymin, ymax, xmin, xmax);
+		//printNewEdgeTable(netEdges);
+		int[][] fill = new int[ymax - ymin][xmax - xmin];
+		horizonEdgeFill(polygon, fill, xmin, ymin, ymax);
+		calFill(netEdges, ymin, ymax, xmin, xmax, fill);
+		return fill;
 	}
 	
-	private int[][] calFill(List<Edge>[] edgeLists, int ymin, int ymax, int xmin, int xmax) {
+	private int[][] calFill(List<Edge>[] edgeLists, int ymin, int ymax, int xmin, int xmax, int[][] fill) {
 		List<Edge> aetEdges = new ArrayList<>(); 
 		
-		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
-			
-			@Override
-			public int compare(Edge o1, Edge o2) {
-				// TODO Auto-generated method stub
-				return o1.x - o2.x;
-			}
-		};
-		int[][] fill = new int[ymax - ymin][xmax - xmin];
-		for (int y = ymin; y < ymax; ++y) {
+		for (int y = ymin; y <= ymax; ++y) {
 			insertNetListToAet(edgeLists[y - ymin], aetEdges);
-			Collections.sort(aetEdges, edgeComparator);
 			
-			int size = aetEdges.size();
-			for (int j = 0; j < size - 1; j += 2) {
-				fillTwoPoint(aetEdges.get(j), aetEdges.get(j + 1), fill, xmin, y - ymin);
-			}
+			fillAetScanLine(aetEdges, fill, xmin, xmax, y, ymin, ymax);
 			
-			removeNonActiveEdgeFromAet(edgeLists[y - ymin], y);
-			updateAndResortAet(edgeLists[y - ymin]);
+			removeNonActiveEdgeFromAet(aetEdges, y);
+			updateAndResortAet(aetEdges);
 		}
 		
 		return fill;
+	}
+	
+	private void horizonEdgeFill(Polygon polygon, int[][] fill, int xmin, int ymin, int ymax) {
+		for (int i = 0; i < polygon.pointNum; ++i) {
+			Point startPoint = polygon.points.get(i);
+			Point endPoint = polygon.points.get((i + 1) % polygon.pointNum);
+			if (startPoint.y != endPoint.y) {
+				continue;
+			}
+			
+			int cury = startPoint.y;
+			if (cury == ymax) {
+				break;
+			}
+			int startx = Math.min(startPoint.x, endPoint.x);
+			int endx = Math.max(startPoint.x, endPoint.x);
+			for (int j = startx; j < endx; ++j) {
+				fill[cury - ymin][j - xmin] = FillType.FULL_FILL.getCode();
+			}
+		}
 	}
 	
 	private void updateAndResortAet(List<Edge> edges) {
@@ -115,14 +127,7 @@ public class Main {
 			edge.x += edge.dx;
 		});
 		
-		Collections.sort(edges, new Comparator<Edge>() {
-
-			@Override
-			public int compare(Edge o1, Edge o2) {
-				// TODO Auto-generated method stub
-				return o1.x - o2.x;
-			}
-		});
+		edges.sort(Comparator.comparing(Edge::getx));
 	}
 	
 	private void removeNonActiveEdgeFromAet(List<Edge> aet, int y) {
@@ -130,23 +135,38 @@ public class Main {
 
 			@Override
 			public boolean test(Edge t) {
-				// TODO Auto-generated method stub
 				return t.ymax == y;
 			}
 		});
 	}
 
-	private void fillTwoPoint(Edge a, Edge b, int[][] fill, int xmin, int y) {
+	private void fillAetScanLine(List<Edge> aetEdges, int[][] fill, int xmin, int xmax, int y, int ymin, int ymax) {
+		int size = aetEdges.size();
+		for (int j = 0; j < size - 1; j += 2) {
+			fillTwoPoint(aetEdges.get(j), aetEdges.get(j + 1), fill, xmin, xmax, y, ymin, ymax);
+		}
+	}
+	
+	private void fillTwoPoint(Edge a, Edge b, int[][] fill, int xmin, int xmax, int y, int ymin, int ymax) {
+		if (y == ymax) {
+			return;
+		}
 		int xstart = a.x;
 		int xend = b.x;
+		
 		if (a.dx == 1) {
 			fill[y][xstart - xmin] = FillType.DIAG_RIGHT_DOWN.getCode();
+			++xstart;
+		} else if (a.dx == -1) {
+			fill[y][xstart - 1 - xmin] = FillType.DIAG_RIGHT_UP.getCode();
 			++xstart;
 		}
 		
 		if (b.dx == -1) {
 			fill[y][xend - 1 - xmin] = FillType.DIAG_LEFT_DOWN.getCode();
 			--xend;
+		} else if (b.dx == 1) {
+			fill[y][xend - xmin] = FillType.DIAG_LEFT_UP.getCode();
 		}
 		
 		for (int x = xstart; x < xend; ++x) {
@@ -160,6 +180,8 @@ public class Main {
 		}
 		
 		aet.addAll(net);
+		
+		aet.sort(Comparator.comparing(Edge::getx));
 	}
 	
 	private void initScanLineNewEdgeTable(List<Edge>[] lists, Polygon polygon, int ymin, int ymax) {
@@ -197,6 +219,21 @@ public class Main {
 		}
 	}
 	
+	private void printNewEdgeTable(List<Edge>[] netEdges) {
+		System.out.println("length:" + netEdges.length);
+		for (int i = 0; i < netEdges.length; ++i) {
+			if (netEdges[i].size() == 0) {
+				System.out.println("empty");
+				continue;
+			}
+			System.out.println("----------------");
+			for (int j = 0; j < netEdges[i].size(); ++j) {
+				System.out.println("x:" + netEdges[i].get(j).x + " dx:" + netEdges[i].get(j).dx + " ymax:" + netEdges[i].get(j).ymax);
+			}
+			System.out.println("----------------");
+		}
+	}
+	
 	private boolean[][] filled;
 	private static final boolean DEBUG = true;
 	
@@ -230,6 +267,29 @@ public class Main {
 		int x;
 		int dx;
 		int ymax;
+		
+		int getx() {
+			return x;
+		}
 	}
-}
+	
+	enum FillType {
+		NOT_FILL(0),
+		FULL_FILL(1),
+		DIAG_LEFT_UP(-1),
+		DIAG_RIGHT_DOWN(2),
+		DIAG_LEFT_DOWN(-3),
+		DIAG_RIGHT_UP(4);
+		
+		private int code;
+		
+		private FillType(int code) {
+			this.code = code;
+		}
+		
+		public int getCode() {
+			return code;
+		}
+	}
 
+}
