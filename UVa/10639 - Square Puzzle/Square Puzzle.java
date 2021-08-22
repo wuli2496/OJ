@@ -50,20 +50,25 @@ public class Main {
 			} else { 
 				printWriter.println("no"); 
 			}
+			printWriter.flush();
 		}
 		
 		scanner.close();
 	}
 	
 	public boolean solve() {
-		filled = new boolean[m][m];
+		filled = new int[m][m];
 		
-		int[][][] puzzles = new int[n][][];
+		List<List<int[][]>> puzzles = initList(n);
 		for (int i = 0; i < n; ++i) {
-			puzzles[i] = scanLineFill(polygons.get(i));
-			//System.out.println(Arrays.deepToString(puzzles[i]));
+			int[][] fill = scanLineFill(polygons.get(i));
+			
+			initFeasibleFill(puzzles.get(i), fill);
 		}
-		return false;
+		
+		//printPuzzles(puzzles);
+		boolean ok = dfs(0, puzzles, filled);
+		return ok;
 	}
 	
 	private int[][] scanLineFill(Polygon polygon) {
@@ -155,22 +160,21 @@ public class Main {
 		int xend = b.x;
 		
 		if (a.dx == 1) {
-			fill[y][xstart - xmin] = FillType.DIAG_RIGHT_DOWN.getCode();
+			fill[y - ymin][xstart - xmin] = FillType.DIAG_RIGHT_DOWN.getCode();
 			++xstart;
 		} else if (a.dx == -1) {
-			fill[y][xstart - 1 - xmin] = FillType.DIAG_RIGHT_UP.getCode();
-			++xstart;
+			fill[y - ymin][xstart - 1 - xmin] = FillType.DIAG_RIGHT_UP.getCode();
 		}
 		
 		if (b.dx == -1) {
-			fill[y][xend - 1 - xmin] = FillType.DIAG_LEFT_DOWN.getCode();
+			fill[y - ymin][xend - 1 - xmin] = FillType.DIAG_LEFT_DOWN.getCode();
 			--xend;
 		} else if (b.dx == 1) {
-			fill[y][xend - xmin] = FillType.DIAG_LEFT_UP.getCode();
+			fill[y - ymin][xend - xmin] = FillType.DIAG_LEFT_UP.getCode();
 		}
 		
 		for (int x = xstart; x < xend; ++x) {
-			fill[y][x - xmin] = FillType.FULL_FILL.getCode();
+			fill[y - ymin][x - xmin] = FillType.FULL_FILL.getCode();
 		}
 	}
 	
@@ -234,8 +238,214 @@ public class Main {
 		}
 	}
 	
-	private boolean[][] filled;
-	private static final boolean DEBUG = true;
+	private void printPuzzles(List<List<int[][]>> puzzles) {
+		System.out.println("puzzles.size():" + puzzles.size());
+		for (int i = 0; i < puzzles.size(); ++i) {
+			List<int[][]> puzzle = puzzles.get(i);
+			System.out.println("puzzle.size():" + puzzle.size());
+			System.out.println("---------------");
+			for (int j = 0; j < puzzle.size(); ++j) {
+				System.out.println(Arrays.deepToString(puzzle.get(j)));
+			}
+			System.out.println("---------------");
+		}
+	}
+	
+	private int[][] rotate(int[][] fill) {
+		int row = fill.length;
+		int col = fill[0].length;
+		
+		int[][] result = new int[col][row];
+		
+		for (int i = 0; i < row; ++i) {
+			for (int j = 0; j < col; ++j) {
+				if (fill[i][j] == FillType.NOT_FILL.getCode() || fill[i][j] == FillType.FULL_FILL.getCode()) {
+					result[col - 1 - j][i] = fill[i][j];
+				} else if (fill[i][j] == FillType.DIAG_LEFT_UP.getCode()) {
+					result[col - 1 - j][i] = FillType.DIAG_RIGHT_UP.getCode();
+				} else if (fill[i][j] == FillType.DIAG_RIGHT_UP.getCode()) {
+					result[col - 1 - j][i] = FillType.DIAG_RIGHT_DOWN.getCode();
+				} else if (fill[i][j] == FillType.DIAG_RIGHT_DOWN.getCode()) {
+					result[col - 1 - j][i] = FillType.DIAG_LEFT_DOWN.getCode();
+				} else if (fill[i][j] == FillType.DIAG_LEFT_DOWN.getCode()) {
+					result[col - 1 - j][i] = FillType.DIAG_LEFT_UP.getCode();
+				}
+			}
+		}
+		return result;
+	}
+	
+	private boolean fillEqual(int[][] source, int[][] target) {
+		int sourceRow = source.length;
+		int sourceCol = source[0].length;
+		
+		int targetRow = target.length;
+		int targetCol = target[0].length;
+		
+		if (sourceRow != targetRow) {
+			return false;
+		}
+		
+		if (sourceCol != targetCol) {
+			return false;
+		}
+		
+		for (int i = 0; i < sourceRow; ++i) {
+			for (int j = 0; j < sourceCol; ++j) {
+				if (source[i][j] != target[i][j]) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	private List<List<int[][]>> initList(int n) {
+		List<List<int[][]>> puzzles = new ArrayList<>();
+		for (int i = 0; i < n; ++i) {
+			puzzles.add(new ArrayList<>());
+		}
+		
+		return puzzles;
+	}
+	
+	private void initFeasibleFill(List<int[][]> list, int[][] fill) {
+		list.add(fill);
+		int[][] result = fill;
+		for (int i = 0; i < 3; ++i) {
+			result = rotate(result);
+			boolean exist = false;
+			for (int j = 0; j < list.size(); ++j) {
+				if (fillEqual(list.get(j), result)) {
+					exist = true;
+					break;
+				}
+			}
+			
+			if (!exist) {
+				list.add(result);
+			}
+		}
+	}
+	
+	boolean dfs(int cur, List<List<int[][]>> fills, int[][] filled) {
+		if (cur == n) {
+			boolean ok = true;
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < m; ++j) {
+					if (filled[i][j] != FillType.FULL_FILL.getCode()) {
+						ok = false;
+						break;
+					}
+				}
+			}
+			
+			return ok;
+		}
+		
+		List<int[][]> curFeasibleFill = fills.get(cur);
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < m; ++j) {
+				if (filled[i][j] != FillType.FULL_FILL.getCode()) {
+					for (int k = 0; k < curFeasibleFill.size(); ++k) {
+						int[][] curFill = curFeasibleFill.get(k);
+						int row = curFill.length;
+						int col = curFill[0].length;
+						if (i + row > m) continue;
+						if (j + col > m) continue;
+						
+						for (int a = 0; a <= m - row; ++a) {
+							for (int b = 0; b <= m - col; ++b) {
+								fillCurSquare(curFill, a, b, filled);
+								boolean ok = checkCurFillSquare(curFill, a, b, filled);
+								if (!ok) {
+									unFillCurSquare(curFill, a, b, filled);
+									continue;
+								}
+								
+								if (dfs(cur + 1, fills, filled)) {
+									return true;
+								} 
+								unFillCurSquare(curFill, a, b, filled);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		
+		for (int i = 0; i < curFeasibleFill.size(); ++i) {
+			int[][] curFill = curFeasibleFill.get(i);
+			int row = curFill.length;
+			int col = curFill[0].length;
+			
+			for (int j = 0; j <= m - row; ++j) {
+				for (int k = 0; k <= m - col; ++k) {
+					fillCurSquare(curFill, j, k, filled);
+					boolean ok = checkCurFillSquare(curFill, j, k, filled);
+					if (!ok) {
+						unFillCurSquare(curFill, j, k, filled);
+						continue;
+					}
+					
+					if (dfs(cur + 1, fills, filled)) {
+						return true;
+					} 
+					unFillCurSquare(curFill, j, k, filled);
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	private void fillCurSquare(int[][] square, int xoffset, int yoffset, int[][] filled) {
+		int row = square.length;
+		int col = square[0].length;
+		
+		for (int i = 0; i < row; ++i) {
+			for (int j = 0; j < col; ++j) {
+				filled[xoffset + i][yoffset + j] += square[i][j];
+			}
+		}
+	}
+	
+	private void unFillCurSquare(int[][] square, int xoffset, int yoffset, int[][] filled) {
+		int row = square.length;
+		int col = square[0].length;
+		
+		for (int i = 0; i < row; ++i) {
+			for (int j = 0; j < col; ++j) {
+				filled[xoffset + i][yoffset + j] -= square[i][j];
+			}
+		}
+	}
+	
+	private boolean checkCurFillSquare(int[][] square, int xoffset, int yoffset, int[][] filled) {
+		int row = square.length;
+		int col = square[0].length;
+		
+		for (int i = 0; i < row; ++i) {
+			for (int j = 0; j < col; ++j) {
+				if (filled[i][j] != FillType.NOT_FILL.getCode() && 
+						filled[i][j] != FillType.FULL_FILL.getCode() &&
+						filled[i][j] != FillType.DIAG_LEFT_UP.getCode() &&
+						filled[i][j] != FillType.DIAG_RIGHT_DOWN.getCode() &&
+						filled[i][j] != FillType.DIAG_LEFT_DOWN.getCode() &&
+						filled[i][j] != FillType.DIAG_RIGHT_UP.getCode()) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	
+	private int[][] filled;
+	private static final boolean DEBUG = false;
 	
 	private int m, n;
 	private List<Polygon> polygons = new ArrayList<>();
