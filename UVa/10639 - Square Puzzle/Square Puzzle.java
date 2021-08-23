@@ -67,7 +67,8 @@ public class Main {
 		}
 		
 		//printPuzzles(puzzles);
-		boolean ok = dfs(0, puzzles, filled);
+		boolean[] visited = new boolean[n];
+		boolean ok = dfs(0, puzzles, filled, visited);
 		return ok;
 	}
 	
@@ -329,7 +330,7 @@ public class Main {
 		}
 	}
 	
-	boolean dfs(int cur, List<List<int[][]>> fills, int[][] filled) {
+	boolean dfs(int cur, List<List<int[][]>> fills, int[][] filled, boolean[] visited) {
 		if (cur == n) {
 			boolean ok = true;
 			for (int i = 0; i < m; ++i) {
@@ -344,6 +345,49 @@ public class Main {
 			return ok;
 		}
 		
+		int startx = 0, starty = 0;
+		boolean found = false;
+		for (int i = 0; i < m && !found; ++i) {
+			for (int j = 0; j < m && !found; ++j) {
+				if (filled[i][j] != FillType.FULL_FILL.getCode()) {
+					found = true;
+					startx = i;
+					starty = j;
+					break;
+				}
+			}
+		}
+		
+		for (int i = 0; i < n; ++i) {
+			if (!visited[i]) {
+				visited[i] = true;
+				List<int[][]> curFeasibleFill = fills.get(i);
+				
+				for (int k = 0; k < curFeasibleFill.size(); ++k) {
+					int[][] curFill = curFeasibleFill.get(k);
+					int row = curFill.length;
+					int col = curFill[0].length;
+					if (startx + row > m) continue;
+					if (starty + col > m) continue;
+					
+					
+					fillCurSquare(curFill, startx, starty, filled);
+					boolean ok = checkCurFillSquare(curFill, startx, starty, filled);
+					if (!ok) {
+						unFillCurSquare(curFill, startx, starty, filled);
+						continue;
+					}
+					
+					if (dfs(cur + 1, fills, filled, visited)) {
+						return true;
+					} 
+					unFillCurSquare(curFill, startx, starty, filled);
+						
+				}
+				
+				visited[i] = false;
+			}
+		}
 		List<int[][]> curFeasibleFill = fills.get(cur);
 		for (int i = 0; i < m; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -364,36 +408,13 @@ public class Main {
 									continue;
 								}
 								
-								if (dfs(cur + 1, fills, filled)) {
+								if (dfs(cur + 1, fills, filled, visited)) {
 									return true;
 								} 
 								unFillCurSquare(curFill, a, b, filled);
 							}
 						}
 					}
-				}
-			}
-		}
-		
-		
-		for (int i = 0; i < curFeasibleFill.size(); ++i) {
-			int[][] curFill = curFeasibleFill.get(i);
-			int row = curFill.length;
-			int col = curFill[0].length;
-			
-			for (int j = 0; j <= m - row; ++j) {
-				for (int k = 0; k <= m - col; ++k) {
-					fillCurSquare(curFill, j, k, filled);
-					boolean ok = checkCurFillSquare(curFill, j, k, filled);
-					if (!ok) {
-						unFillCurSquare(curFill, j, k, filled);
-						continue;
-					}
-					
-					if (dfs(cur + 1, fills, filled)) {
-						return true;
-					} 
-					unFillCurSquare(curFill, j, k, filled);
 				}
 			}
 		}
