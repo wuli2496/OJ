@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <functional>
+#include <climits>
 
 using namespace std;
 
@@ -52,13 +53,13 @@ void fastio()
 void printNewEdgeTable(vector<vector<Edge>>& netEdges) 
 {
     cout << "length:" << netEdges.size() << endl;
-    for (int i = 0; i < netEdges.size(); ++i) {
+    for (size_t i = 0; i < netEdges.size(); ++i) {
         if (netEdges[i].size() == 0) {
             cout << "empty" << endl;
             continue;
         }
         cout << "----------------" << endl;
-        for (int j = 0; j < netEdges[i].size(); ++j) {
+        for (size_t j = 0; j < netEdges[i].size(); ++j) {
             cout << "x:" << netEdges[i][j].x  << " dx:"  << netEdges[i][j].dx  << " ymax:" << netEdges[i][j].ymax << endl;
         }
         cout << "----------------" << endl;
@@ -68,11 +69,11 @@ void printNewEdgeTable(vector<vector<Edge>>& netEdges)
 void printPuzzles(vector<vector<FillSquare>> puzzles) 
 {
     cout << "puzzles.size():" << puzzles.size() << endl;
-    for (int i = 0; i < puzzles.size(); ++i) {
+    for (size_t i = 0; i < puzzles.size(); ++i) {
         vector<FillSquare>& puzzle = puzzles[i];
         cout << "puzzle.size():"  << puzzle.size() << endl;
         cout <<"---------------" << endl;
-        for (int j = 0; j < puzzle.size(); ++j) {
+        for (size_t j = 0; j < puzzle.size(); ++j) {
             FillSquare& fillSquare = puzzle[j];
             for (int a = 0; a < fillSquare.row; ++a) {
                 for (int b = 0; b < fillSquare.col; ++b) {
@@ -89,7 +90,7 @@ void calXYMinMax(Polygon& polygon, int& xmin, int& xmax, int& ymin, int& ymax)
     xmin = ymin = INT_MAX;
     xmax = ymax = INT_MIN;
 
-    for (int i = 0; i < polygon.points.size(); ++i) {
+    for (size_t i = 0; i < polygon.points.size(); ++i) {
         const Point& point = polygon.points[i];
 
         xmin = min(xmin, point.x);
@@ -194,7 +195,7 @@ bool isEdgeOutOfActive(Edge e, int y)
 
 void removeNonActiveEdgeFromAet(vector<Edge>& aet, int y)
 {
-    aet.erase(remove_if(aet.begin(), aet.end(), bind2nd(ptr_fun(isEdgeOutOfActive), y)));
+    aet.erase(remove_if(aet.begin(), aet.end(), bind2nd(ptr_fun(isEdgeOutOfActive), y)), aet.end());
 }
 
 void updateAetEdgeInfo(Edge& e)
@@ -213,22 +214,23 @@ void calFill(vector<vector<Edge>>& edges, FillSquare& fillSquare)
     vector<Edge> activeEdges;
     for (int y = ymin; y <= ymax; ++y) {
         insertNetListToAet(edges[y - ymin], activeEdges);
-
+        //cout << "insertNetListToAet" << endl;
         fillAetScanLine(activeEdges, fillSquare, y);
-
+        //cout << "fillAetScanLine" << endl;
         removeNonActiveEdgeFromAet(activeEdges, y);
+        //cout << "removeNonActiveEdgeFromAet" << endl;
         updateAndResortAet(activeEdges);
+        //cout << "updateAndResortAet" << endl;
     }
 }
 
 void scanLineFill(Polygon& polygon, FillSquare& fillSquare)
 {
-    int xmin, xmax, ymin, ymax;
     calXYMinMax(polygon, xmin, xmax, ymin, ymax);
     vector<vector<Edge>> edges(ymax - ymin + 1);
 
     initScanLineNewEdgeTable(edges, polygon);
-    printNewEdgeTable(edges);
+    //printNewEdgeTable(edges);
     fillSquare.row = ymax - ymin;
     fillSquare.col = xmax - xmin;
     calFill(edges, fillSquare);
@@ -296,7 +298,7 @@ void initFeasibleFill(vector<FillSquare>& list, FillSquare& fill)
     for (int i = 0; i < 3; ++i) {
         result = rotate(result);
         bool exist = false;
-        for (int j = 0; j < list.size(); ++j) {
+        for (size_t j = 0; j < list.size(); ++j) {
             if (fillEqual(list[j], result)) {
                 exist = true;
                 break;
@@ -354,7 +356,7 @@ bool checkCurFillSquare(FillSquare& square, int xoffset, int yoffset, FillSquare
     return true;
 }
 
-bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled)
+bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled, vector<bool>& visited)
 {
     if (cur == n) {
         bool ok = true;
@@ -369,58 +371,48 @@ bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled)
 
         return ok;
     }
-
-    vector<FillSquare>& curFeasibleFill = fills[cur];
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < m; ++j) {
+    
+    bool found = false;
+    int startx = 0, starty = 0;
+    for (int i = 0; i < m && !found; ++i) {
+        for (int j = 0; j < m && !found; ++j) {
             if (filled.fill[i][j] != FULL_FILL) {
-                for (int k = 0; k < curFeasibleFill.size(); ++k) {
-                    FillSquare& curFill = curFeasibleFill[k];
-                    int row = curFill.row;
-                    int col = curFill.col;
-                    if (i + row > m) continue;
-                    if (j + col > m) continue;
-
-                    for (int a = 0; a <= m - row; ++a) {
-                        for (int b = 0; b <= m - col; ++b) {
-                            fillCurSquare(curFill, a, b, filled);
-                            bool ok = checkCurFillSquare(curFill, a, b, filled);
-                            if (!ok) {
-                                unFillCurSquare(curFill, a, b, filled);
-                                continue;
-                            }
-
-                            if (dfs(cur + 1, fills, filled)) {
-                                return true;
-                            }
-                            unFillCurSquare(curFill, a, b, filled);
-                        }
-                    }
-                }
+                startx = i;
+                starty = j;
+                found = true;
+                break;
             }
         }
     }
-
-
-    for (int i = 0; i < curFeasibleFill.size(); ++i) {
-        FillSquare& curFill = curFeasibleFill[i];
-        int row = curFill.row;
-        int col = curFill.col;
-
-        for (int j = 0; j <= m - row; ++j) {
-            for (int k = 0; k <= m - col; ++k) {
-                fillCurSquare(curFill, j, k, filled);
-                bool ok = checkCurFillSquare(curFill, j, k, filled);
+    
+    if (!found) {
+        return false;
+    }
+    
+    for (int i = 0; i < n; ++i) {
+        if (!visited[i]) {
+            visited[i] = true;
+            vector<FillSquare>& curFeasibleFill = fills[i];
+            for (size_t k = 0; k < curFeasibleFill.size(); ++k) {
+                FillSquare& curFill = curFeasibleFill[k];
+                int row = curFill.row;
+                int col = curFill.col;
+                if (startx + row > m) continue;
+                if (starty + col > m) continue;
+                
+                fillCurSquare(curFill, startx, starty, filled);
+                bool ok = checkCurFillSquare(curFill, startx, starty, filled);
                 if (!ok) {
-                    unFillCurSquare(curFill, j, k, filled);
+                    unFillCurSquare(curFill, startx, starty, filled);
                     continue;
                 }
 
-                if (dfs(cur + 1, fills, filled)) {
+                if (dfs(cur + 1, fills, filled, visited)) {
                     return true;
                 }
-                unFillCurSquare(curFill, j, k, filled);
+                unFillCurSquare(curFill, startx, starty, filled);
             }
+            visited[i] = false;
         }
     }
 
@@ -430,7 +422,8 @@ bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled)
 bool solve()
 {
     memset(&filled, 0x00, sizeof filled);
-
+    puzzles.clear();
+    puzzles.resize(n);
     for (int i = 0; i < n; ++i) {
         FillSquare fillSquare;
         memset(&fillSquare, 0x00, sizeof fillSquare);
@@ -438,9 +431,31 @@ bool solve()
         initFeasibleFill(puzzles[i], fillSquare);
     }
     
-    printPuzzles(puzzles);
-    bool ok = dfs(0, puzzles, filled);
+    //printPuzzles(puzzles);
+    vector<bool> visited(n, false);
+    bool ok = dfs(0, puzzles, filled, visited);
     return ok;
+}
+
+bool isClockWise(const Polygon& polygon) 
+{
+    double p = 0;
+    size_t size = polygon.points.size();
+    for (size_t i = 0; i < size - 1; ++i) {
+        const Point& pa = polygon.points[i];
+        const Point& pb = polygon.points[i + 1];
+        p += -0.5 * (pa.y + pb.y) * (pb.x - pa.x);
+    }
+    
+    return p > 0;
+}
+
+void convertPolygon(Polygon& source, Polygon& target)
+{
+    target.points.push_back(source.points[0]);
+    for (size_t i = source.points.size() - 1; i >= 1; --i) {
+        target.points.push_back(source.points[i]);
+    }
 }
 
 int main()
@@ -465,14 +480,21 @@ int main()
                 cin >> x >> y;
                 polygon.points.push_back((Point){x, y});
             }
-            polygons.push_back(polygon);
+            
+            if (isClockWise(polygon)) {
+                polygons.push_back(polygon);
+            } else {
+                Polygon target;
+                convertPolygon(polygon, target);
+                polygons.push_back(target);
+            }
         }
 
         bool ans = solve();
         if (ans) {
-            cout << "yes";
+            cout << "yes" << endl;
         } else {
-            cout << "no";
+            cout << "no" << endl;
         }
     }
 
@@ -481,3 +503,69 @@ int main()
     #endif // ONLINE_JUDGE
     return 0;
 }
+
+/*
+11
+5 6
+4 0 0 3 0 3 3 0 3
+3 0 0 3 3 0 3
+3 0 0 3 3 0 3
+3 0 0 6 0 3 3
+3 0 0 6 0 3 3
+3 4
+5 1 0 3 0 3 3 2 4 1 4
+3 0 0 2 0 1 1
+5 1 0 3 0 3 3 2 4 1 4
+2 2
+6 0 0 0 2 1 2 1 1 2 1 2 0
+4 0 0 0 1 1 1 1 0
+4 3
+8 0 0 0 3 3 3 3 2 1 2 1 1 2 1 2 0
+3 1 2 3 2 3 0
+3 1 1 1 2 2 1
+3 2 0 2 1 3 0
+3 3
+10 0 0 0 3 3 3 3 1 2 1 2 2 1 2 1 1 2 1 2 0
+4 1 1 1 2 2 2 2 1
+4 1 1 1 2 2 2 2 1
+2 1
+3 0 0 1 0 1 1
+3 1 0 1 1 0 1
+2 3
+10 0 0 0 3 3 3 3 1 2 1 2 2 1 2 1 1 2 1 2 0
+3 1 2 3 2 3 0
+4 3
+3 0 0 2 0 2 2
+3 0 0 2 0 2 2
+4 0 0 0 3 1 3 1 1
+4 0 0 0 3 1 3 1 1
+4 3
+3 0 0 2 0 2 2
+3 0 0 2 0 2 2
+4 0 0 0 3 1 3 1 1
+4 0 0 0 3 1 2 1 0
+4 2
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+3 0 1 1 2 1 0
+5 2
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+4 0 0 0 1 1 1 1 0
+
+yes
+no
+yes
+yes
+yes
+yes
+no
+yes
+yes
+no
+no
+*/
+
