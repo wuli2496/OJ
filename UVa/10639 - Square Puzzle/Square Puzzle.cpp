@@ -437,7 +437,7 @@ bool solve()
     return ok;
 }
 
-bool isClockWise(const Polygon& polygon) 
+bool isCounterClockWise(const Polygon& polygon) 
 {
     double p = 0;
     size_t size = polygon.points.size();
@@ -481,7 +481,7 @@ int main()
                 polygon.points.push_back((Point){x, y});
             }
             
-            if (isClockWise(polygon)) {
+            if (isCounterClockWise(polygon)) {
                 polygons.push_back(polygon);
             } else {
                 Polygon target;
