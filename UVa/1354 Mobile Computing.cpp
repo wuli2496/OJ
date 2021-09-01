@@ -28,15 +28,15 @@ void dfs(int subset)
     for (int left = subset & (subset - 1); left; left = (subset & (left - 1))) {
         hasChild = true;
         int right = subset ^ left;
-        double l = sum[right] / sum[subset];
-        double r = sum[left] / sum[subset];
+        double lLen = sum[right] / sum[subset];
+        double rLen = sum[left] / sum[subset];
         dfs(left);
         dfs(right);
         for (size_t i = 0; i < trees[left].size(); ++i) {
             for (size_t j = 0; j < trees[right].size(); ++j) {
                 Tree tree;
-                tree.l = max(trees[left][i].l + l, trees[right][j].l - r);
-                tree.r = max(trees[left][i].r - l, trees[right][j].r + r);
+                tree.l = max(trees[left][i].l + lLen, trees[right][j].l - rLen);
+                tree.r = max(trees[left][i].r - lLen, trees[right][j].r + rLen);
                 if (tree.l + tree.r < r) {
                     trees[subset].push_back(tree);
                 }
@@ -86,11 +86,6 @@ int main()
         fill(visited, visited + root + 1, false);
         dfs(root);
 
-        for (int i = 0; i < (1 << s); ++i) {
-            for (auto& tree : trees[i]) {
-                cout << tree.l << " " << tree.r << endl;
-            }
-        }
         double ans = -1;
         for (size_t i = 0; i < trees[root].size(); ++i) {
             ans = max(ans, trees[root][i].l + trees[root][i].r);
