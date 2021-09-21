@@ -27,7 +27,10 @@ struct Edge
 
     bool operator < (const Edge& other) const
     {
-        return x < other.x;
+        if (x != other.x) {
+            return x < other.x;
+        }
+        return dx < other.dx;
     }
 };
 
