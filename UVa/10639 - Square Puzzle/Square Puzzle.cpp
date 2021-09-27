@@ -8,6 +8,7 @@
 
 using namespace std;
 
+
 const int MAXM = 7;
 const int NOT_FILL = 0, FULL_FILL = 1, DIAG_LEFT_UP = -1, DIAG_RIGHT_DOWN = 2, DIAG_LEFT_DOWN = -3, DIAG_RIGHT_UP = 4;
 
@@ -24,6 +25,7 @@ struct Polygon
 struct Edge
 {
     int x, dx, ymax;
+    bool changed;
 
     bool operator < (const Edge& other) const
     {
@@ -53,8 +55,27 @@ void fastio()
     cout.tie(NULL);
 }
 
-void printNewEdgeTable(vector<vector<Edge>>& netEdges) 
+void printPolygon(const Polygon& polygon)
 {
+    #ifdef DEBUG
+    for (int i = 0; i < polygon.points.size(); ++i) {
+        const Point& point = polygon.points[i];
+        cout << "(" << point.x << "," << point.y << ") ";
+    }
+    cout << endl;
+    #endif // DEBUG
+}
+
+void printY(int y)
+{
+    #ifdef DEBUG
+    cout << "ymin:" << ymin << " ymax:" << ymax << " y:" << y << endl << endl;
+    #endif
+}
+
+void printNewEdgeTable(vector<vector<Edge>>& netEdges)
+{
+    #ifdef DEBUG
     cout << "length:" << netEdges.size() << endl;
     for (size_t i = 0; i < netEdges.size(); ++i) {
         if (netEdges[i].size() == 0) {
@@ -67,10 +88,24 @@ void printNewEdgeTable(vector<vector<Edge>>& netEdges)
         }
         cout << "----------------" << endl;
     }
+    #endif
 }
 
-void printPuzzles(vector<vector<FillSquare>> puzzles) 
+
+void printActiveEdges(const vector<Edge>& activeEdges)
 {
+    #ifdef DEBUG
+    cout << "active length:" << activeEdges.size() << endl;
+    for (int i = 0; i < activeEdges.size(); ++i) {
+        const Edge& edge = activeEdges[i];
+        cout << "x:" << edge.x << " dx:" << edge.dx << " ymax:" << edge.ymax << endl;
+    }
+    #endif
+}
+
+void printPuzzles(vector<vector<FillSquare>> puzzles)
+{
+    #ifdef DEBUG
     cout << "puzzles.size():" << puzzles.size() << endl;
     for (size_t i = 0; i < puzzles.size(); ++i) {
         vector<FillSquare>& puzzle = puzzles[i];
@@ -87,6 +122,7 @@ void printPuzzles(vector<vector<FillSquare>> puzzles)
         }
         cout <<"---------------" << endl;
     }
+    #endif
 }
 void calXYMinMax(Polygon& polygon, int& xmin, int& xmax, int& ymin, int& ymax)
 {
@@ -153,7 +189,18 @@ void insertNetListToAet(vector<Edge>& net, vector<Edge>& aet)
         aet.push_back(e);
     }
 
-    sort(aet.begin(), aet.end());
+    stable_sort(aet.begin(), aet.end());
+}
+
+bool isFill(const FillSquare& fillSquare, int x, int y)
+{
+    int val = fillSquare.fill[y][x];
+    if (val == DIAG_RIGHT_DOWN || val == DIAG_RIGHT_UP || val == DIAG_LEFT_DOWN || val == DIAG_LEFT_UP
+        || val == FULL_FILL) {
+        return true;
+    }
+
+    return false;
 }
 
 void fillTwoPoint(Edge& a, Edge& b, FillSquare& fillSquare, int y)
@@ -168,7 +215,9 @@ void fillTwoPoint(Edge& a, Edge& b, FillSquare& fillSquare, int y)
         fillSquare.fill[y - ymin][xstart - xmin] = DIAG_RIGHT_DOWN;
         ++xstart;
     } else if (a.dx == -1) {
-        fillSquare.fill[y - ymin][xstart - 1 - xmin] = DIAG_RIGHT_UP;
+        if (!isFill(fillSquare, xstart - 1 - xmin, y - ymin)) {
+            fillSquare.fill[y - ymin][xstart - 1 - xmin] = DIAG_RIGHT_UP;
+        }
     }
 
     if (b.dx == -1) {
@@ -185,6 +234,7 @@ void fillTwoPoint(Edge& a, Edge& b, FillSquare& fillSquare, int y)
 
 void fillAetScanLine(vector<Edge>& aetEdges, FillSquare& fillSquare, int y)
 {
+    printY(y);
     int size = aetEdges.size();
     for (int i = 0; i < size - 1; i += 2) {
         fillTwoPoint(aetEdges[i], aetEdges[i + 1], fillSquare, y);
@@ -204,12 +254,12 @@ void removeNonActiveEdgeFromAet(vector<Edge>& aet, int y)
 void updateAetEdgeInfo(Edge& e)
 {
     e.x += e.dx;
+    e.changed = true;
 }
 
 void updateAndResortAet(vector<Edge>& aet)
 {
     for_each(aet.begin(), aet.end(), updateAetEdgeInfo);
-    sort(aet.begin(), aet.end());
 }
 
 void calFill(vector<vector<Edge>>& edges, FillSquare& fillSquare)
@@ -218,6 +268,7 @@ void calFill(vector<vector<Edge>>& edges, FillSquare& fillSquare)
     for (int y = ymin; y <= ymax; ++y) {
         insertNetListToAet(edges[y - ymin], activeEdges);
         //cout << "insertNetListToAet" << endl;
+        printActiveEdges(activeEdges);
         fillAetScanLine(activeEdges, fillSquare, y);
         //cout << "fillAetScanLine" << endl;
         removeNonActiveEdgeFromAet(activeEdges, y);
@@ -231,9 +282,9 @@ void scanLineFill(Polygon& polygon, FillSquare& fillSquare)
 {
     calXYMinMax(polygon, xmin, xmax, ymin, ymax);
     vector<vector<Edge>> edges(ymax - ymin + 1);
-
+    printPolygon(polygon);
     initScanLineNewEdgeTable(edges, polygon);
-    //printNewEdgeTable(edges);
+    printNewEdgeTable(edges);
     fillSquare.row = ymax - ymin;
     fillSquare.col = xmax - xmin;
     calFill(edges, fillSquare);
@@ -374,7 +425,7 @@ bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled, vector<
 
         return ok;
     }
-    
+
     bool found = false;
     int startx = 0, starty = 0;
     for (int i = 0; i < m && !found; ++i) {
@@ -387,11 +438,11 @@ bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled, vector<
             }
         }
     }
-    
+
     if (!found) {
         return false;
     }
-    
+
     for (int i = 0; i < n; ++i) {
         if (!visited[i]) {
             visited[i] = true;
@@ -402,7 +453,7 @@ bool dfs(int cur, vector<vector<FillSquare>>& fills, FillSquare& filled, vector<
                 int col = curFill.col;
                 if (startx + row > m) continue;
                 if (starty + col > m) continue;
-                
+
                 fillCurSquare(curFill, startx, starty, filled);
                 bool ok = checkCurFillSquare(curFill, startx, starty, filled);
                 if (!ok) {
@@ -433,14 +484,14 @@ bool solve()
         scanLineFill(polygons[i], fillSquare);
         initFeasibleFill(puzzles[i], fillSquare);
     }
-    
-    //printPuzzles(puzzles);
+
+    printPuzzles(puzzles);
     vector<bool> visited(n, false);
     bool ok = dfs(0, puzzles, filled, visited);
     return ok;
 }
 
-bool isCounterClockWise(const Polygon& polygon) 
+bool isCounterClockWise(const Polygon& polygon)
 {
     double p = 0;
     size_t size = polygon.points.size();
@@ -449,7 +500,7 @@ bool isCounterClockWise(const Polygon& polygon)
         const Point& pb = polygon.points[i + 1];
         p += -0.5 * (pa.y + pb.y) * (pb.x - pa.x);
     }
-    
+
     return p > 0;
 }
 
@@ -483,7 +534,7 @@ int main()
                 cin >> x >> y;
                 polygon.points.push_back((Point){x, y});
             }
-            
+
             if (isCounterClockWise(polygon)) {
                 polygons.push_back(polygon);
             } else {
@@ -506,69 +557,3 @@ int main()
     #endif // ONLINE_JUDGE
     return 0;
 }
-
-/*
-11
-5 6
-4 0 0 3 0 3 3 0 3
-3 0 0 3 3 0 3
-3 0 0 3 3 0 3
-3 0 0 6 0 3 3
-3 0 0 6 0 3 3
-3 4
-5 1 0 3 0 3 3 2 4 1 4
-3 0 0 2 0 1 1
-5 1 0 3 0 3 3 2 4 1 4
-2 2
-6 0 0 0 2 1 2 1 1 2 1 2 0
-4 0 0 0 1 1 1 1 0
-4 3
-8 0 0 0 3 3 3 3 2 1 2 1 1 2 1 2 0
-3 1 2 3 2 3 0
-3 1 1 1 2 2 1
-3 2 0 2 1 3 0
-3 3
-10 0 0 0 3 3 3 3 1 2 1 2 2 1 2 1 1 2 1 2 0
-4 1 1 1 2 2 2 2 1
-4 1 1 1 2 2 2 2 1
-2 1
-3 0 0 1 0 1 1
-3 1 0 1 1 0 1
-2 3
-10 0 0 0 3 3 3 3 1 2 1 2 2 1 2 1 1 2 1 2 0
-3 1 2 3 2 3 0
-4 3
-3 0 0 2 0 2 2
-3 0 0 2 0 2 2
-4 0 0 0 3 1 3 1 1
-4 0 0 0 3 1 3 1 1
-4 3
-3 0 0 2 0 2 2
-3 0 0 2 0 2 2
-4 0 0 0 3 1 3 1 1
-4 0 0 0 3 1 2 1 0
-4 2
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-3 0 1 1 2 1 0
-5 2
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-4 0 0 0 1 1 1 1 0
-
-yes
-no
-yes
-yes
-yes
-yes
-no
-yes
-yes
-no
-no
-*/
-
