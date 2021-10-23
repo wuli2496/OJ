@@ -1,13 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <vector>
-#include <cstring>
-#include <functional>
-#include <climits>
+#include <bits/stdc++.h>
 
 using namespace std;
 
+//#define DEBUG
 
 const int MAXM = 7;
 const int NOT_FILL = 0, FULL_FILL = 1, DIAG_LEFT_UP = -1, DIAG_RIGHT_DOWN = 2, DIAG_LEFT_DOWN = -3, DIAG_RIGHT_UP = 4;
@@ -25,7 +20,6 @@ struct Polygon
 struct Edge
 {
     int x, dx, ymax;
-    bool changed;
 
     bool operator < (const Edge& other) const
     {
@@ -254,7 +248,6 @@ void removeNonActiveEdgeFromAet(vector<Edge>& aet, int y)
 void updateAetEdgeInfo(Edge& e)
 {
     e.x += e.dx;
-    e.changed = true;
 }
 
 void updateAndResortAet(vector<Edge>& aet)
@@ -574,7 +567,6 @@ int main()
 7 0 2 1 2 2 3 3 2 4 2 4 4 0 4
 7 0 0 4 0 4 2 3 2 2 1 1 2 0 2
 4 1 2 2 1 3 2 2 3
-
 5 6
 4 0 0 3 0 3 3 0 3
 3 0 0 3 3 0 3
@@ -624,7 +616,6 @@ int main()
 4 0 0 0 1 1 1 1 0
 4 0 0 0 1 1 1 1 0
 4 0 0 0 1 1 1 1 0
-
 yes
 no
 yes
