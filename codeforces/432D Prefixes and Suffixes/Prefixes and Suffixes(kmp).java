@@ -56,22 +56,13 @@ public class Main {
     
     	List<Node> ans = new ArrayList<>();
     	int cur = n - 1;
-    	while (cur > 0) {
+    	while (cur >= 0) {
     		Node node = new Node();
     		node.l = cur + 1;
     		node.c = cnt[cur + 1];
     		ans.add(node);
     		
     		cur = pi[cur] - 1;
-    	}
-    	
-    	if (cur == 0) {
-    		if (cnt[cur + 1] > 0) {
-    			Node node = new Node();
-        		node.l = 1;
-        		node.c = cnt[cur + 1];
-        		ans.add(node);
-    		}
     	}
     	
     	Collections.sort(ans);
