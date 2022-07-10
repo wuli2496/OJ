@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表单示例</title>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model="message" placeholder="输入...">
+        <p>输入的内容是：{{message}}</p>
+
+        <textarea v-model="text" placeholder="输入..."></textarea>
+        <p>输入的内容是：</p>
+        <p style="white-space: pre">{{text}}</p>
+
+        <input type="radio" :checked="picked">
+        <label>单选按钮</label>
+
+        <br>
+        <br>
+        <input type="radio" v-model="picked2" value="html" id="html">
+        <label for="html">HTML</label>
+        <br>
+        <input type="radio" v-model="picked2" value="js" id="js">
+        <label for="js">JavaScript</label>
+        <br>
+        <input type="radio" v-model="picked2" value="css" id="css">
+        <label for="css">CSS</label>
+        <br>
+        <p>选择的项是： {{picked2}}</p>
+
+        <br>
+        <br>
+        <input type="checkbox" v-model="checked" id="checked">
+        <label for="checked">选择状态：{{checked}}</label>
+
+        <br>
+        <br>
+        <input type="checkbox" v-model="checked2" value="html">
+        <label for="html">HTML</label>
+        <br>
+        <input type="checkbox" v-model="checked2" value="js">
+        <label for="js">JavaScript</label>
+        <br>
+        <input type="checkbox" v-model="checked2" value="css">
+        <label for="css">CSS</label>
+        <br>
+        <p>选择的项是: {{checked2}}</p>
+
+        <br>
+        <br>
+        <select v-model="selected" multiple>
+            <option>html</option>
+            <option value="js">JavaScript</option>
+            <option>css</option>
+        </select>
+        <p>选择的项是：{{selected}}</p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el : '#app',
+            data : {
+                message : '',
+                text : '',
+                picked : false,
+                picked2 : 'html',
+                checked : false,
+                checked2 : ['css', 'js'],
+                selected : 'html'
+            }
+        })
+    </script>
+</body>
+</html>
