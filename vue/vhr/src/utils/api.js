@@ -28,8 +28,8 @@ axios.interceptors.response.use(success => {
     }
 })
 
-let base = '';
-
+let base = 'http://localhost:8080';
+axios.defaults.withCredentials=true
 export const postKeyValueRequest = (url, params) => {
     return axios({
         method : 'post',

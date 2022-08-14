@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-form
-        :rules="rules"
         ref="loginForm"
+        :rules="rules"
         v-loading="loading"
         element-loading-text="正在登录..."
         element-loading-spinner="el-icon-loading"
@@ -22,10 +22,10 @@
       <el-form-item prop="code">
         <el-input size="normal" type="text" v-model="loginForm.code" auto-complete="off"
                   placeholder="点击图片更换验证码" style="width: 250px"></el-input>
-        <img :src="vcUrl"  alt="" style="cursor: pointer">
+        <img :src="vcUrl"  alt="" style="cursor: pointer" @click="updateVerifyCode">
       </el-form-item>
       <el-checkbox size="normal" class="loginRemember" v-model="checked"></el-checkbox>
-      <el-button size="normal" type="primary" style="width: 100%;" >登录</el-button>
+      <el-button size="normal" type="primary" style="width: 100%;" @click="submitLogin">登录</el-button>
     </el-form>
   </div>
 </template>
@@ -34,13 +34,45 @@
   export default {
       data() {
         return {
+          loading : false,
+          vcUrl : 'http://localhost:8080/verifyCode',
           loginForm: {
             username: 'admin',
             password: '123'
           },
-          checked: true
+          checked: true,
+          rules: {
+            username: [{required: true, message: '请输入用户名', trigger: 'blur'}],
+            password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+            code: [{required: true, message: '请输入验证码', trigger: 'blur'}]
+          }
+        }
+      },
+      methods: {
+
+        submitLogin() {
+          this.$refs.loginForm.validate((valid) => {
+            if (valid) {
+              this.loading = true;
+              this.postRequest('/doLogin', this.loginForm).then(resp => {
+                this.loading = false;
+                if (resp) {
+                 console.log(resp)
+                }else{
+                  this.vcUrl = '/verifyCode?time='+new Date();
+                }
+              })
+            } else {
+              return false;
+            }
+          });
+
+        },
+        updateVerifyCode() {
+          this.vcUrl = '/verifyCode?time='+new Date();
         }
       }
+
   }
 </script>
 
