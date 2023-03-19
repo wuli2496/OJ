@@ -4,6 +4,7 @@ using namespace std;
 
 const int maxn = 100000 + 10;
 
+
 vector<int> p(maxn);
 
 int findset(int x)
