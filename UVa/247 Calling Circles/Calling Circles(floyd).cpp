@@ -13,7 +13,6 @@ bool vis[N];
 map<string, int> nameMap;
 vector<string> names;
 
-
 int getId(const string& name)
 {
     if (!nameMap.count(name))
