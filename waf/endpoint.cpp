@@ -3,7 +3,7 @@
 
 BEGIN_NAMESPACE
 
-EndPoint::EndPoint() : ip(IP_ANY), port(0)
+EndPoint::EndPoint()
 {
 
 }
