@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #endif
 
-
+#include <iostream>
 #include "namespace.h"
 
 BEGIN_NAMESPACE
@@ -18,13 +18,23 @@ class EndPoint
 public:
     EndPoint();
 
+    EndPoint(int family, unsigned short port);
+
+    sockaddr* data();
+
+    std::size_t size();
+
+    bool isV4()
+    {
+        return data_.base.sa_family == AF_INET;
+    }
 private:
     union data_union
     {
         sockaddr base;
         sockaddr_in v4;
         sockaddr_in6 v6;
-    }data_;
+    } data_;
 };
 
 END_NAMESPACE
