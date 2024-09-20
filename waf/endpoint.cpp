@@ -35,5 +35,24 @@ std::size_t EndPoint::size()
     return sizeof(data_.v6);
 }
 
+std::string EndPoint::getIp()
+{
+    char addr[MAX_LEN];
+    const char*tmp = inet_ntop(AF_INET, &(data_.v4.sin_addr.s_addr), addr, MAX_LEN);
+
+    if (tmp == nullptr)
+    {
+        return "";
+    }
+
+
+    return addr;
+}
+
+unsigned short EndPoint::getPort()
+{
+    return ntohs(data_.v4.sin_port);
+}
+
 
 END_NAMESPACE

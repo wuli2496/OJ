@@ -31,6 +31,10 @@ public:
         return data_.base.sa_family == AF_INET;
     }
 
+    std::string getIp();
+
+    unsigned short getPort();
+
 private:
     union data_union
     {
@@ -38,6 +42,8 @@ private:
         sockaddr_in v4;
         sockaddr_in6 v6;
     } data_;
+
+    const int MAX_LEN = 256;
 };
 
 END_NAMESPACE
