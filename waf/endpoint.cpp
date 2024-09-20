@@ -11,15 +11,14 @@ EndPoint::EndPoint()
     data_.v4.sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
-EndPoint::EndPoint(int family, unsigned short port)
+EndPoint::EndPoint(std::string ip, unsigned short port)
     :data_()
 {
-    if (family == AF_INET)
-    {
-        data_.v4.sin_family = AF_INET;
-        data_.v4.sin_port = htons(port);
-        data_.v4.sin_addr.s_addr = htonl(INADDR_ANY);
-    }
+
+    data_.v4.sin_family = AF_INET;
+    data_.v4.sin_port = htons(port);
+    data_.v4.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, ip.c_str(), &(data_.v4.sin_addr.s_addr));
 }
 
 sockaddr* EndPoint::data()

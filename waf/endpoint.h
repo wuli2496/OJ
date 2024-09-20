@@ -4,10 +4,12 @@
 #if _WIN32 || WIN32
 #include <WinSock2.h>
 #include <ws2ipdef.h>
+#include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
 #endif
 
+#include <string>
 #include <iostream>
 #include "namespace.h"
 
@@ -18,7 +20,7 @@ class EndPoint
 public:
     EndPoint();
 
-    EndPoint(int family, unsigned short port);
+    EndPoint(std::string ip, unsigned short port);
 
     sockaddr* data();
 
