@@ -24,10 +24,11 @@ public:
 
     std::size_t size();
 
-    bool isV4()
+    inline bool isV4()
     {
         return data_.base.sa_family == AF_INET;
     }
+
 private:
     union data_union
     {
