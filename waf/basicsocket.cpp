@@ -8,29 +8,29 @@ BasicSocket::BasicSocket()
 }
 
 
-WAF_HANDLE BasicSocket::getHandle()
+WafHandle BasicSocket::getHandle()
 {
     return handle;
 }
 
-void BasicSocket::setHandle(WAF_HANDLE handle)
+void BasicSocket::setHandle(WafHandle handle)
 {
     this->handle = handle;
 }
 
 int BasicSocket::getOption(int level, int option, void* optval, int* optlen)
 {
-    return ::getsockopt((WAF_SOCKET)getHandle(), level, option, (char*)optval, optlen);
+    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
 }
 
 int BasicSocket::setOption(int level, int option, void* optval, int optlen)
 {
-    return ::setsockopt((WAF_SOCKET)getHandle(), level, option, (char*)optval, optlen);
+    return ::setsockopt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
 }
 
 int BasicSocket::open(int type, int protocol_family, int protocol, int resuse_addr)
 {
-    setHandle((WAF_HANDLE)socket(protocol_family, type, protocol));
+    setHandle((WafHandle)socket(protocol_family, type, protocol));
     if (getHandle() == INVALID_HANDLE) {
         return -1;
     }
@@ -49,7 +49,7 @@ int BasicSocket::close()
     int result = 0;
     if (getHandle() != INVALID_HANDLE) {
 #ifdef _WIN32 || WIN32
-        result = ::closesocket((WAF_SOCKET)getHandle());
+        result = ::closesocket((WafSocket)getHandle());
 #else
         result = ::close(getHandle());
 #endif

@@ -8,7 +8,7 @@ EndPoint::EndPoint()
 {
     data_.v4.sin_family = AF_INET;
     data_.v4.sin_port = 0;
-    data_.v4.sin_addr.s_addr = INADDR_ANY;
+    data_.v4.sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
 EndPoint::EndPoint(int family, unsigned short port)
@@ -18,7 +18,7 @@ EndPoint::EndPoint(int family, unsigned short port)
     {
         data_.v4.sin_family = AF_INET;
         data_.v4.sin_port = htons(port);
-        data_.v4.sin_addr.s_addr = INADDR_ANY;
+        data_.v4.sin_addr.s_addr = htonl(INADDR_ANY);
     }
 }
 

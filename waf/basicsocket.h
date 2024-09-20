@@ -11,9 +11,9 @@ class BasicSocket
 public:
     BasicSocket();
 
-    WAF_HANDLE getHandle();
+    WafHandle getHandle();
 
-    void setHandle(WAF_HANDLE handle);
+    void setHandle(WafHandle handle);
 
     int open(int type, int protocol_family, int protocol, int resuse_addr);
 
@@ -24,7 +24,7 @@ public:
     int close();
 
 private:
-    WAF_HANDLE handle;
+    WafHandle handle;
 };
 
 END_NAMESPACE

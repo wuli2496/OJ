@@ -10,12 +10,12 @@
 BEGIN_NAMESPACE
 
 #if _WIN32 || WIN32
-typedef HANDLE WAF_HANDLE;
-typedef SOCKET WAF_SOCKET;
+typedef HANDLE WafHandle;
+typedef SOCKET WafSocket;
 #define INVALID_HANDLE INVALID_HANDLE_VALUE
 #else
-typedef int WAF_HANDLE;
-typedef WAF_HANDLE WAF_SOCKET;
+typedef int WafHandle;
+typedef int WafSocket;
 #define INVALID_HANDLE -1
 #endif
 
