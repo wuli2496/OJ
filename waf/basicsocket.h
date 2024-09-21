@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "namespace.h"
+#include <cstddef>
 
 BEGIN_NAMESPACE
 
@@ -17,9 +18,9 @@ public:
 
     int open(int type, int protocol_family, int protocol, int resuse_addr);
 
-    int getOption(int level, int option, void* optval, int* optlen);
+    int getOption(int level, int option, void* optval, std::size_t* optlen);
 
-    int setOption(int level, int option, void* optval, int optlen);
+    int setOption(int level, int option, void* optval, std::size_t optlen);
 
     int close();
 

@@ -1,7 +1,7 @@
 #ifndef ENDPOINT_H
 #define ENDPOINT_H
 
-#if _WIN32 || WIN32
+#if defined(_WIN32) || defined(WIN32)
 #include <WinSock2.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>

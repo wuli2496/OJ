@@ -9,7 +9,7 @@
 
 BEGIN_NAMESPACE
 
-#if _WIN32 || WIN32
+#if defined(_WIN32) || defined(WIN32)
 typedef HANDLE WafHandle;
 typedef SOCKET WafSocket;
 #define INVALID_HANDLE INVALID_HANDLE_VALUE

@@ -1,5 +1,12 @@
 #include "basicsocket.h"
 
+#if defined(_WIN32) || defined(WIN32)
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
+
 BEGIN_NAMESPACE
 
 BasicSocket::BasicSocket()
@@ -18,12 +25,12 @@ void BasicSocket::setHandle(WafHandle handle)
     this->handle = handle;
 }
 
-int BasicSocket::getOption(int level, int option, void* optval, int* optlen)
+int BasicSocket::getOption(int level, int option, void* optval, std::size_t* optlen)
 {
-    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
+    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, (socklen_t*)optlen);
 }
 
-int BasicSocket::setOption(int level, int option, void* optval, int optlen)
+int BasicSocket::setOption(int level, int option, void* optval, std::size_t optlen)
 {
     return ::setsockopt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
 }
@@ -48,7 +55,7 @@ int BasicSocket::close()
 {
     int result = 0;
     if (getHandle() != INVALID_HANDLE) {
-#ifdef _WIN32 || WIN32
+#if defined(_WIN32) || defined(WIN32)
         result = ::closesocket((WafSocket)getHandle());
 #else
         result = ::close(getHandle());
