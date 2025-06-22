@@ -38,7 +38,7 @@ std::size_t EndPoint::size()
 std::string EndPoint::getIp()
 {
     char addr[MAX_LEN];
-    const char*tmp = inet_ntop(AF_INET, &(data_.v4.sin_addr.s_addr), addr, MAX_LEN);
+    const char* tmp = ::inet_ntop(AF_INET, &(data_.v4.sin_addr.s_addr), addr, MAX_LEN);
 
     if (tmp == nullptr)
     {

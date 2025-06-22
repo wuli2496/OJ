@@ -27,7 +27,7 @@ void BasicSocket::setHandle(WafHandle handle)
 
 int BasicSocket::getOption(int level, int option, void* optval, std::size_t* optlen)
 {
-    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, (socklen_t*)optlen);
+    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, (int*)optlen);
 }
 
 int BasicSocket::setOption(int level, int option, void* optval, std::size_t optlen)

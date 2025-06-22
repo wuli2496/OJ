@@ -1,7 +1,6 @@
 QT -= gui
 
 TEMPLATE = lib
-CONFIG += staticlib
 
 CONFIG += c++11
 
@@ -25,6 +24,8 @@ HEADERS += \
     config.h \
     endpoint.h \
     namespace.h
+
+DEFINES += LIBRARY_EXPORTS
 
 # Default rules for deployment.
 unix {

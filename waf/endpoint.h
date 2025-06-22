@@ -15,7 +15,7 @@
 
 BEGIN_NAMESPACE
 
-class EndPoint
+class LIBRARY_API EndPoint
 {
 public:
     EndPoint();
@@ -43,7 +43,7 @@ private:
         sockaddr_in6 v6;
     } data_;
 
-    const int MAX_LEN = 256;
+    const static int MAX_LEN = 256;
 };
 
 END_NAMESPACE
