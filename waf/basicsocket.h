@@ -4,6 +4,7 @@
 #include "config.h"
 #include "namespace.h"
 #include <cstddef>
+#include "endpoint.h"
 
 BEGIN_NAMESPACE
 
@@ -23,6 +24,8 @@ public:
     int setOption(int level, int option, void* optval, std::size_t optlen);
 
     int close();
+
+    int bindAddress(const EndPoint& endpoint);
 
 private:
     WafHandle handle;

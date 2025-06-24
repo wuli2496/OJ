@@ -1,6 +1,7 @@
 #include "basicsocket.h"
 
-#if defined(_WIN32) || defined(WIN32)
+#if defined(WIN32)
+#include <winsock.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -55,7 +56,7 @@ int BasicSocket::close()
 {
     int result = 0;
     if (getHandle() != INVALID_HANDLE) {
-#if defined(_WIN32) || defined(WIN32)
+#if defined(WIN32)
         result = ::closesocket((WafSocket)getHandle());
 #else
         result = ::close(getHandle());
@@ -63,6 +64,13 @@ int BasicSocket::close()
     }
 
     return result;
+}
+
+int BasicSocket::bindAddress(const EndPoint& endpoint)
+{
+    int ret = ::bind((WafSocket)handle, (struct sockaddr*)(endpoint.data()), endpoint.size());
+
+    return ret;
 }
 
 

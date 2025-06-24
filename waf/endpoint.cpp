@@ -21,12 +21,12 @@ EndPoint::EndPoint(std::string ip, unsigned short port)
     inet_pton(AF_INET, ip.c_str(), &(data_.v4.sin_addr.s_addr));
 }
 
-sockaddr* EndPoint::data()
+const sockaddr* EndPoint::data() const
 {
-    return &data_.base;
+    return &(data_.base);
 }
 
-std::size_t EndPoint::size()
+std::size_t EndPoint::size() const
 {
     if (isV4()) {
         return sizeof(data_.v4);

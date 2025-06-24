@@ -1,7 +1,7 @@
 #ifndef ENDPOINT_H
 #define ENDPOINT_H
 
-#if defined(_WIN32) || defined(WIN32)
+#if defined(WIN32)
 #include <WinSock2.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
@@ -22,11 +22,11 @@ public:
 
     EndPoint(std::string ip, unsigned short port);
 
-    sockaddr* data();
+    const sockaddr* data() const;
 
-    std::size_t size();
+    std::size_t size() const;
 
-    inline bool isV4()
+    inline bool isV4() const
     {
         return data_.base.sa_family == AF_INET;
     }
