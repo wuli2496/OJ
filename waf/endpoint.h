@@ -24,7 +24,7 @@ public:
 
     const sockaddr* data() const;
 
-    sockadd* data();
+    sockaddr* data();
 
     std::size_t size() const;
 
