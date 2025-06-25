@@ -27,6 +27,8 @@ public:
 
     int bindAddress(const EndPoint& endpoint);
 
+    int listen();
+
 private:
     WafHandle handle;
 };

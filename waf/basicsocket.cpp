@@ -73,5 +73,10 @@ int BasicSocket::bindAddress(const EndPoint& endpoint)
     return ret;
 }
 
+int BasicSocket::listen()
+{
+    int ret = ::listen((WafSocket)handle, SOMAXCONN);
+    return ret;
+}
 
 END_NAMESPACE
