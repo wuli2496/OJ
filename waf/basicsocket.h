@@ -8,7 +8,7 @@
 
 BEGIN_NAMESPACE
 
-class BasicSocket
+class LIBRARY_API BasicSocket
 {
 public:
     BasicSocket();

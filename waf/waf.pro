@@ -17,13 +17,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     basicsocket.cpp \
-    endpoint.cpp
+    endpoint.cpp \
+    winsockinit.cpp
 
 HEADERS += \
     basicsocket.h \
     config.h \
     endpoint.h \
-    namespace.h
+    namespace.h \
+    winsockinit.h
 
 DEFINES += LIBRARY_EXPORTS
 
