@@ -26,6 +26,11 @@ const sockaddr* EndPoint::data() const
     return &(data_.base);
 }
 
+sockaddr* EndPoint::data()
+{
+    return &(data_.base);
+}
+
 std::size_t EndPoint::size() const
 {
     if (isV4()) {

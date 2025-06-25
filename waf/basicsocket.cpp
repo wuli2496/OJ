@@ -79,4 +79,12 @@ int BasicSocket::listen()
     return ret;
 }
 
+int BasicSocket::accept(EndPoint& endpoint)
+{
+    int len = 0;
+    int fd = ::accept((WafSocket)handle, endpoint.data(), &len);
+
+    return fd;
+}
+
 END_NAMESPACE

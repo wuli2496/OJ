@@ -29,6 +29,8 @@ public:
 
     int listen();
 
+    int accept(EndPoint& endpoint);
+
 private:
     WafHandle handle;
 };

@@ -24,6 +24,8 @@ public:
 
     const sockaddr* data() const;
 
+    sockadd* data();
+
     std::size_t size() const;
 
     inline bool isV4() const
