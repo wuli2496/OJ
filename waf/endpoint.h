@@ -13,7 +13,7 @@
 #include <iostream>
 #include "namespace.h"
 
-BEGIN_NAMESPACE
+BEGIN_NAMESPACE(waf)
 
 class LIBRARY_API EndPoint
 {

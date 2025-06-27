@@ -3,6 +3,8 @@
 
 #if defined(WIN32)
 
+BEGIN_NAMESPACE(waf)
+
 void WinsockInitBase::startup(data& d, unsigned char major, unsigned char minor)
 {
     if (::InterlockedIncrement(&d.initCount) == 1)
@@ -21,5 +23,6 @@ void WinsockInitBase::cleanup(data& d)
         ::WSACleanup();
     }
 }
+END_NAMESPACE
 
 #endif

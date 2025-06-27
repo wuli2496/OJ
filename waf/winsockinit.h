@@ -1,7 +1,11 @@
 #ifndef WINSOCKINIT_H
 #define WINSOCKINIT_H
 
+#include "namespace.h"
+
 #if defined(WIN32)
+
+BEGIN_NAMESPACE(waf)
 
 class WinsockInitBase
 {
@@ -43,5 +47,7 @@ template<int Major, int Minor>
 WinsockInitBase::data WinsockInit<Major, Minor>::data_;
 
 static const WinsockInit<>& winsockInitInstance = WinsockInit<>();
+
+END_NAMESPACE
 #endif
 #endif // WINSOCKINIT_H

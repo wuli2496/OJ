@@ -1,7 +1,7 @@
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
 
-#define BEGIN_NAMESPACE namespace waf {
+#define BEGIN_NAMESPACE(ns) namespace ns {
 
 #define END_NAMESPACE }
 

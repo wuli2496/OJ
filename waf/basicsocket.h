@@ -6,7 +6,7 @@
 #include <cstddef>
 #include "endpoint.h"
 
-BEGIN_NAMESPACE
+BEGIN_NAMESPACE(waf)
 
 class LIBRARY_API BasicSocket
 {

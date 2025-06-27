@@ -1,7 +1,7 @@
 #include "endpoint.h"
 
 
-BEGIN_NAMESPACE
+BEGIN_NAMESPACE(waf)
 
 EndPoint::EndPoint()
     :data_()

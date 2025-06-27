@@ -7,7 +7,7 @@
 #include <WinSock2.h>
 #endif
 
-BEGIN_NAMESPACE
+BEGIN_NAMESPACE(waf)
 
 #if defined(WIN32)
 typedef HANDLE WafHandle;

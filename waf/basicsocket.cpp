@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-BEGIN_NAMESPACE
+BEGIN_NAMESPACE(waf)
 
 BasicSocket::BasicSocket()
 {
