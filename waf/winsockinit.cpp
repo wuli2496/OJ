@@ -1,7 +1,6 @@
 #include "winsockinit.h"
-#include <windows.h>
 
-#if defined(WIN32)
+#if defined(OS_WIN)
 
 BEGIN_NAMESPACE(waf)
 
@@ -23,6 +22,6 @@ void WinsockInitBase::cleanup(data& d)
         ::WSACleanup();
     }
 }
-END_NAMESPACE
+END_NAMESPACE(waf)
 
 #endif

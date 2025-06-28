@@ -1,21 +1,14 @@
 #ifndef ENDPOINT_H
 #define ENDPOINT_H
 
-#if defined(WIN32)
-#include <WinSock2.h>
-#include <ws2ipdef.h>
-#include <ws2tcpip.h>
-#else
-#include <arpa/inet.h>
-#endif
-
+#include "platform.h"
 #include <string>
 #include <iostream>
-#include "namespace.h"
+#include "export.h"
 
 BEGIN_NAMESPACE(waf)
 
-class LIBRARY_API EndPoint
+class EXPORT EndPoint
 {
 public:
     EndPoint();
@@ -30,7 +23,7 @@ public:
 
     inline bool isV4() const
     {
-        return data_.base.sa_family == AF_INET;
+        return base.sa_family == AF_INET;
     }
 
     std::string getIp();
@@ -38,16 +31,16 @@ public:
     unsigned short getPort();
 
 private:
-    union data_union
+    union
     {
         sockaddr base;
         sockaddr_in v4;
         sockaddr_in6 v6;
-    } data_;
+    };
 
     const static int MAX_LEN = 256;
 };
 
-END_NAMESPACE
+END_NAMESPACE(waf)
 
 #endif // ENDPOINT_H

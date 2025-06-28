@@ -18,16 +18,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     basicsocket.cpp \
     endpoint.cpp \
+    socketops.cpp \
     winsockinit.cpp
 
 HEADERS += \
     basicsocket.h \
-    config.h \
     endpoint.h \
-    namespace.h \
+    export.h \
+    platform.h \
+    socketops.h \
     winsockinit.h
 
-DEFINES += LIBRARY_EXPORTS
+DEFINES += EXPORTS
 
 # Default rules for deployment.
 unix {

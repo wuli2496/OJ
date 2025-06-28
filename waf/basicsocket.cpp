@@ -1,12 +1,6 @@
 #include "basicsocket.h"
 
-#if defined(WIN32)
-#include <winsock.h>
-#else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 BEGIN_NAMESPACE(waf)
 
@@ -56,7 +50,7 @@ int BasicSocket::close()
 {
     int result = 0;
     if (getHandle() != INVALID_HANDLE) {
-#if defined(WIN32)
+#if defined(OS_WIN)
         result = ::closesocket((WafSocket)getHandle());
 #else
         result = ::close(getHandle());
@@ -87,4 +81,4 @@ int BasicSocket::accept(EndPoint& endpoint)
     return fd;
 }
 
-END_NAMESPACE
+END_NAMESPACE(waf)

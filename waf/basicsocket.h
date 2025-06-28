@@ -1,14 +1,14 @@
 #ifndef BASICSOCKET_H
 #define BASICSOCKET_H
 
-#include "config.h"
-#include "namespace.h"
+#include "platform.h"
+#include "export.h"
 #include <cstddef>
 #include "endpoint.h"
 
 BEGIN_NAMESPACE(waf)
 
-class LIBRARY_API BasicSocket
+class EXPORT BasicSocket
 {
 public:
     BasicSocket();
@@ -35,6 +35,6 @@ private:
     WafHandle handle;
 };
 
-END_NAMESPACE
+END_NAMESPACE(waf)
 
 #endif // BASICSOCKET_H

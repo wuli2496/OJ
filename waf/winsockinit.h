@@ -1,9 +1,10 @@
 #ifndef WINSOCKINIT_H
 #define WINSOCKINIT_H
 
-#include "namespace.h"
+#include "export.h"
+#include "platform.h"
 
-#if defined(WIN32)
+#if defined(OS_WIN)
 
 BEGIN_NAMESPACE(waf)
 
@@ -48,6 +49,8 @@ WinsockInitBase::data WinsockInit<Major, Minor>::data_;
 
 static const WinsockInit<>& winsockInitInstance = WinsockInit<>();
 
-END_NAMESPACE
+END_NAMESPACE(waf)
+
 #endif
+
 #endif // WINSOCKINIT_H
