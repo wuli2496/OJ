@@ -1,6 +1,7 @@
 #include "basicsocket.h"
 
 #include "platform.h"
+#include "socketops.h"
 
 BEGIN_NAMESPACE(waf)
 
@@ -22,12 +23,12 @@ void BasicSocket::setHandle(WafHandle handle)
 
 int BasicSocket::getOption(int level, int option, void* optval, std::size_t* optlen)
 {
-    return ::getsockopt((WafSocket)getHandle(), level, option, (char*)optval, (int*)optlen);
+    return SocketOps::getSockOpt((WafSocket)getHandle(), level, option, (char*)optval, (int*)optlen);
 }
 
 int BasicSocket::setOption(int level, int option, void* optval, std::size_t optlen)
 {
-    return ::setsockopt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
+    return SocketOps::setSockOpt((WafSocket)getHandle(), level, option, (char*)optval, optlen);
 }
 
 int BasicSocket::open(int type, int protocol_family, int protocol, int resuse_addr)
@@ -62,21 +63,21 @@ int BasicSocket::close()
 
 int BasicSocket::bindAddress(const EndPoint& endpoint)
 {
-    int ret = ::bind((WafSocket)handle, (struct sockaddr*)(endpoint.data()), endpoint.size());
+    int ret = SocketOps::bind((WafSocket)handle, (struct sockaddr*)(endpoint.data()), endpoint.size());
 
     return ret;
 }
 
 int BasicSocket::listen()
 {
-    int ret = ::listen((WafSocket)handle, SOMAXCONN);
+    int ret = SocketOps::listen((WafSocket)handle, SOMAXCONN);
     return ret;
 }
 
 int BasicSocket::accept(EndPoint& endpoint)
 {
     int len = 0;
-    int fd = ::accept((WafSocket)handle, endpoint.data(), &len);
+    int fd = SocketOps::accept((WafSocket)handle, endpoint.data(), &len);
 
     return fd;
 }

@@ -51,12 +51,12 @@ int getSocketError()
 #endif
 }
 
-const char* inet_ntop(int af, const void* src, char* dest, size_t length)
+const char* inetNtop(int af, const void* src, char* dest, size_t length)
 {
     return ::inet_ntop(af, src, dest, length);
 }
 
-int inet_pton(int af, const char* src, void* dest)
+int inetPton(int af, const char* src, void* dest)
 {
     return ::inet_pton(af, src, dest);
 }
@@ -79,6 +79,36 @@ unsigned long networkToHostLong(unsigned long value)
 unsigned long hostToNetworkLong(unsigned long value)
 {
     return ::htonl(value);
+}
+
+int getSockOpt(WafSocket s, int level, int optname, char *optval, int *optlen)
+{
+    return ::getsockopt(s, level, optname, optval, optlen);
+}
+
+int setSockOpt(WafSocket s, int level, int optname, char *optval, int optlen)
+{
+    return ::setsockopt(s, level, optname, optval, optlen);
+}
+
+int bind(WafSocket s, sockaddr* addr, int addrlen)
+{
+    return ::bind(s, addr, addrlen);
+}
+
+int listen(WafSocket s, int backlog)
+{
+    return ::listen(s, backlog);
+}
+
+int accept(WafSocket s, sockaddr* addr, int* addrlen)
+{
+    return ::accept(s, addr, addrlen);
+}
+
+int connect(WafSocket s, sockaddr* addr, int addrlen)
+{
+    return ::connect(s, addr, addrlen);
 }
 
 END_NAMESPACE(SocketOps)
