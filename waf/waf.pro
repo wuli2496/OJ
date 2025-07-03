@@ -25,6 +25,7 @@ HEADERS += \
     basicsocket.h \
     endpoint.h \
     export.h \
+    mutex.h \
     platform.h \
     socketops.h \
     winsockinit.h
